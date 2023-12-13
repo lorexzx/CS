@@ -251,4 +251,93 @@ def render_step(step, placeholder):
 
             # Step 5: Result
        # Step 5: Result
-        
+        elif step == 4:  # Results step
+            if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                if st.button('Predict Rental Price', key='predict_button'):
+                    extracted_zip_code = st.session_state.extracted_zip_code
+                    if extracted_zip_code is not None:
+                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                        if predicted_price is not None:
+                            st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+
+                            # Ähnliche Immobilien finden und anzeigen
+                            similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            if not similar_properties.empty:
+                                st.markdown("### Ähnliche Immobilien:")
+                                col1, col2 = st.columns(2)
+                                for index, row in similar_properties.head(6).iterrows():
+                                    current_col = col1 if index % 2 == 0 else col2
+                                    with current_col:
+                                        rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+                                        price_per_month = row.get('Price', 'N/A')
+                                        area_code = row.get('zip', 'N/A')
+                                        st.markdown(
+                                            f"**Zimmer:** {rooms if rooms is not None else 'N/A'} \n"
+                                            f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m² \n"
+                                            f"**Preis:** CHF {price_per_month} pro Monat \n"
+                                            f"**Adresse:** {area_code}")
+                            else:
+                                st.write("Keine ähnlichen Immobilien gefunden.")
+
+                            # Plotly-Diagramm
+                            current_rent_step4 = st.session_state.current_rent
+                            # Anpassung der Gauge-Werte
+                            min_gauge_value = 0.9 * predicted_price
+                            max_gauge_value = 1.5 * predicted_price
+                            one_third_point = min_gauge_value + (1/3) * (max_gauge_value - min_gauge_value)
+                            one_four_point_five_range = (1/4.5) * (max_gauge_value - min_gauge_value)
+
+                            fig = go.Figure(go.Indicator(
+                                mode = "gauge+number+delta",
+                                value = current_rent_step4,
+                                domain = {'x': [0, 1], 'y': [0, 1]},
+                                title = {'text': "Calculated rental price (red line) and your Rent (blue bar)", 'font': {'size': 21}},
+                                delta = {'reference': predicted_price, 'increasing': {'color': "red"}, 'decreasing': {'color': "green"}},
+                                gauge = {
+                                    'axis': {'range': [min_gauge_value, max_gauge_value], 'tickwidth': 1, 'tickcolor': "darkblue"},
+                                    'bar': {'color': "darkblue"},
+                                    'bgcolor': "white",
+                                    'borderwidth': 2,
+                                    'bordercolor': "gray",
+                                    'steps': [
+                                        {'range': [min_gauge_value, one_third_point], 'color': 'green'},
+                                        {'range': [one_third_point, one_third_point + one_four_point_five_range], 'color': 'yellow'},
+                                        {'range': [one_third_point + one_four_point_five_range, one_third_point + 2 * one_four_point_five_range], 'color': 'orange'},
+                                        {'range': [one_third_point + 2 * one_four_point_five_range, max_gauge_value], 'color': 'red'}],
+                                    'threshold': {
+                                        'line': {'color': "red", 'width': 4},
+                                        'thickness': 0.75,
+                                        'value': predicted_price}}))
+
+                            fig.update_layout(paper_bgcolor = "white", font = {'color': "darkblue", 'family': "Arial"})
+                            st.plotly_chart(fig)
+                        else:
+                            st.error("Unable to predict price. Please check your inputs.")
+                    else:
+                        st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
+            else:
+                st.error("Please enter all required information in the previous steps.")
+
+
+# Function to render navigation buttons
+def render_navigation_buttons(placeholder):
+    col1, col2 = st.columns([1, 1])
+  
+    with col1:
+        if st.session_state.current_step > 0:
+            if st.button('Previous'):
+                st.session_state.current_step -= 1
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
+    
+    with col2:
+        if st.session_state.current_step < len(steps) - 1:
+            if st.button('Next'):
+                st.session_state.current_step += 1
+                placeholder.empty()  # Clear the previous content
+                render_step(st.session_state.current_step, placeholder)
+
+# Call the render_step function with the current step and the placeholder
+render_step(st.session_state.current_step, step_content)
+render_navigation_buttons(step_content)
