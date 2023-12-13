@@ -267,12 +267,12 @@ def render_step(step, placeholder):
                                 for index, row in similar_properties.head(6).iterrows():
                                     current_col = col1 if index % 2 == 0 else col2
                                     with current_col:
-                                        property_type = f"{row.get('Name', 'N/A')} - {row.get('Details', 'N/A')}"
+                                        
                                         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
                                         price_per_month = row.get('Price', 'N/A')
                                         area_code = row.get('zip', 'N/A')
                                         
-                                        st.markdown(f"**Typ:** {property_type} \n"
+                                        st.markdown(
                                                     f"**Zimmer:** {rooms if rooms is not None else 'N/A'} \n"
                                                     f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m² \n"
                                                     f"**Preis:** CHF {price_per_month} pro Monat \n"
