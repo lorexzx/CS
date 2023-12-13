@@ -232,14 +232,35 @@ if 'current_step' not in st.session_state:
 step_content = st.empty()
 
 def display_property_details(row):
-                                rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
-                                price_per_month = row.get('Price', 'N/A')
-                                area_code = row.get('zip', 'N/A')
-                                
-                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
-                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
-                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
-                                st.write(f"**Adresse:** {area_code}")
+    # CSS-Stil für den Rahmen
+    frame_style = """
+    <style>
+    .frame {
+        border: 2px solid #f0f0f0;  # Farbe des Rahmens
+        border-radius: 10px;  # Gerundete Ecken
+        padding: 10px;  # Abstand zwischen Rand und Inhalt
+        margin-bottom: 10px;  # Abstand zwischen den Rahmen
+    }
+    </style>
+    """
+
+    # Einbetten des CSS-Stils
+    st.markdown(frame_style, unsafe_allow_html=True)
+
+    # Container mit dem angepassten Stil
+    with st.container():
+        st.markdown('<div class="frame">', unsafe_allow_html=True)
+
+        rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+        price_per_month = row.get('Price', 'N/A')
+        area_code = row.get('zip', 'N/A')
+        
+        st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
+        st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+        st.write(f"**Preis:** CHF {price_per_month} pro Monat")
+        st.write(f"**Adresse:** {area_code}")
+
+        st.markdown('</div>', unsafe_allow_html=True)
 
 def render_step(step, placeholder):
     with placeholder.container():
