@@ -334,7 +334,7 @@ def render_step(step, placeholder):
                             st.write(f"**Größe:** {st.session_state.size_m2} m²")
                             st.write(f"**Aktuelle Miete:** CHF {st.session_state.current_rent}")
         # Anzeige des vorhergesagten Preises direkt unter den Benutzereingaben
-                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                            st.write(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**")
 
 
 # Plotly-Diagramm
