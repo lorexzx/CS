@@ -223,10 +223,9 @@ def render_step(step, placeholder):
                 extracted_zip_code = extract_zip_from_address(processed_address)
                 st.session_state.extracted_zip_code = extracted_zip_code
 
-
                 if extracted_zip_code:
-                    lat, lon = get_lat_lon_from_address_or_zip(address_input)
-                    popup_message = f"Eingegebene Adresse: {address_input}"
+                    lat, lon = get_lat_lon_from_address_or_zip(processed_address)
+                    popup_message = f"Eingegebene Adresse: {processed_address}"
                 else:
                     st.error("Please enter a valid address or zip code in St. Gallen.")
 
@@ -264,7 +263,7 @@ def render_step(step, placeholder):
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
-    
+   
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
