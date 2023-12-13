@@ -7,8 +7,8 @@ import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
-
-import plotly.io as pio
+import matplotlib as mp
+import plotly.graph_objs as go
 
 # Setzen Sie das Plotly-Standard-Design
 pio.templates.default = 'plotly'
