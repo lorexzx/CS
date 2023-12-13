@@ -218,7 +218,10 @@ def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
             # Step 1: Location
-            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
+            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", 
+                              value=st.session_state.get('address', ''), 
+                              key="address_input_step1")
+            st.session_state.address = address_input
 
             if address_input:
                 processed_input = process_input(address_input)
@@ -239,19 +242,26 @@ def render_step(step, placeholder):
                 popup_message = "Default Location in St. Gallen"
 
             # Create and display the map
-            map = folium.Map(location=[lat, lon], zoom_start=13)
+            map = folium.Map(location=[lat, lon], zoom_start=16)
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
         
         elif step == 1:
             #step 2 rooms
-                    st.session_state.rooms = st.selectbox("Select the number of rooms", range(1, 7), key='rooms_step2')
+                rooms_selection = st.selectbox("Select the number of rooms", 
+                               range(1, 7), 
+                               index=st.session_state.get('rooms', 0) - 1, 
+                               key='rooms_step2')
+                st.session_state.rooms = rooms_selection
 
             # Step 3: Size
         elif step == 2:
-                st.session_state.size_m2 = st.number_input("Enter the size in square meters", min_value=0, key='size_m2_step3')
-
+                size_input = st.number_input("Enter the size in square meters", 
+                             min_value=0, 
+                             value=st.session_state.get('size_m2', 0), 
+                             key='size_m2_step3')
+                st.session_state.size_m2 = size_input
             # Step 4: Current Rent
         elif step == 3:
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
