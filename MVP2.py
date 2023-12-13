@@ -319,7 +319,16 @@ def render_step(step, placeholder):
                             else:
                                 st.write("Keine ähnlichen Immobilien gefunden.")
 
-
+                            def display_property_details(row):
+                                rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+                                price_per_month = row.get('Price', 'N/A')
+                                area_code = row.get('zip', 'N/A')
+                                
+                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
+                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
+                                st.write(f"**Adresse:** {area_code}")
+                                
                             # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
                             # Anpassung der Gauge-Werte
