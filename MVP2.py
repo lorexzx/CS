@@ -244,6 +244,8 @@ def render_step(step, placeholder):
             map = folium.Map(location=[lat, lon], zoom_start=16)
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
+            # Debug print
+            print(f"Extracted ZIP Code: {st.session_state.extracted_zip_code}")
         
         
         elif step == 1:
