@@ -259,6 +259,7 @@ def render_step(step, placeholder):
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 # Ähnliche Immobilien finden und anzeigen
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
                                 col1, col2 = st.columns(2)
@@ -266,19 +267,14 @@ def render_step(step, placeholder):
                                 for index, row in similar_properties.head(6).iterrows():
                                     current_col = col1 if index % 2 == 0 else col2
                                     with current_col:
-                                        # Anpassen der Markierungen, um die neuen Spaltennamen zu verwenden
-                                        # 'Property_Type' wird durch eine Kombination aus 'Name' und 'Details' ersetzt
-                                        # 'Rooms' und 'Size_m2' werden direkt aus 'Details' extrahiert
-                                        # 'price_per_month' wird durch 'Price' ersetzt
-                                        # 'area_code' wird aus der Spalte 'zip' extrahiert
-                                        property_type = f"{row['Name']} - {row['Details']}"
-                                        rooms, size_m2 = extract_rooms_and_size(row['Details'])
-                                        price_per_month = row['Price']
-                                        area_code = row['zip']
+                                        property_type = f"{row.get('Name', 'N/A')} - {row.get('Details', 'N/A')}"
+                                        rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+                                        price_per_month = row.get('Price', 'N/A')
+                                        area_code = row.get('zip', 'N/A')
                                         
                                         st.markdown(f"**Typ:** {property_type} \n"
-                                                    f"**Zimmer:** {rooms} \n"
-                                                    f"**Größe:** {size_m2} m² \n"
+                                                    f"**Zimmer:** {rooms if rooms is not None else 'N/A'} \n"
+                                                    f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m² \n"
                                                     f"**Preis:** CHF {price_per_month} pro Monat \n"
                                                     f"**Adresse:** {area_code}")
                             else:
