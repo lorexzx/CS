@@ -284,12 +284,13 @@ def render_step(step, placeholder):
                     lat, lon = default_lat, default_lon
                     popup_message = "Error in location retrieval, showing default location."
 
+
             else:
                 lat, lon = default_lat, default_lon
                 popup_message = "Default Location in St. Gallen"
 
             # Create and display the map with 'Stamen Toner' style
-            map = folium.Map(location=[lat, lon], zoom_start=16, tiles="Stamen Toner")
+            map = folium.Map(location=[lat, lon], zoom_start=16, tiles="Stamen Toner", attr="Map data © OpenStreetMap contributors")
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
