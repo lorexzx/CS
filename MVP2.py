@@ -47,20 +47,20 @@ def preprocess_and_train():
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
 
-    real_estate_data['rooms'], real_estate_data['area'] = zip(*real_estate_data['Details'].apply(extract_details))
-    real_estate_data['price'] = real_estate_data['Price'].apply(convert_price)
-    real_estate_data['area_code'] = real_estate_data['zip'].str.extract(r'(\d{4})')
+    sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
+    sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
-    real_estate_data.dropna(subset=['rooms', 'area', 'price', 'area_code'], inplace=True)
+    sorted_data.dropna(inplace=True)
 
-    X = real_estate_data[['rooms', 'area', 'area_code']]
-    y = real_estate_data['price']
+    X = sorted_data[['rooms', 'area', 'area_code']]
+    y = sorted_data['Price']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    return model, real_estate_data
+    return model, sorted_data
 
 def extract_zip_code(input_text):
     parts = input_text.replace(',', ' ').split()
