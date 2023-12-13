@@ -181,10 +181,19 @@ def process_address_input(input_address):
     
     # Check if any variant of St. Gallen is already in the address
     if any(variant in input_address.lower() for variant in st_gallen_variants):
-        return input_address  # Address already contains a variant of St. Gallen
+        # Address already contains a variant of St. Gallen
+        return input_address
     else:
-        return input_address + ", St. Gallen"  # Append "St. Gallen" to localize the search
+        # Append "St. Gallen" to localize the search
+        return input_address + ", St. Gallen"
 
+
+def process_input(input_text):
+    # Check if input is a 4-digit number (zip code)
+    if input_text.isdigit() and len(input_text) == 4:
+        return input_text + ", St. Gallen, Switzerland"
+    else:
+        return process_address_input(input_text)  # Process general address
 
 # Initialize session state for current step
 if 'current_step' not in st.session_state:
@@ -212,26 +221,26 @@ def render_step(step, placeholder):
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", key="address_input_step1")
 
             if address_input:
-                processed_address = process_address_input(address_input)
-                st.session_state.address = processed_address
+                processed_input = process_input(address_input)
+                st.session_state.address = processed_input
 
                 try:
-                    # Get latitude and longitude from the processed address
-                    lat, lon = get_lat_lon_from_address_or_zip(processed_address)
-                    popup_message = f"Eingegebene Adresse: {processed_address}"
-                except Exception as e:
-                    st.error(f"Error retrieving location: {e}")
-                    lat, lon = default_lat, default_lon  # Fallback to default coordinates
-                    popup_message = "Default Location"
+                    # Attempt to get latitude and longitude
+                    lat, lon = get_lat_lon_from_address_or_zip(processed_input)
+                    popup_message = f"Location: {processed_input}"
+                except Exception:
+                    # Default to St. Gallen's coordinates on error
+                    lat, lon = default_lat, default_lon
+                    popup_message = "Error in location retrieval, showing default location."
 
             else:
-                # Default map if no input is provided
+                # Default coordinates and message
                 lat, lon = default_lat, default_lon
-                popup_message = "Default Location"
+                popup_message = "Default Location in St. Gallen"
 
             # Create and display the map
-            map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker([lat, lon], popup=popup_message).add_to(map)
+            map = folium.Map(location=[lat, lon], zoom_start=13)
+            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
         
