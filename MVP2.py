@@ -308,11 +308,7 @@ def render_step(step, placeholder):
                                         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
                                         price_per_month = row.get('Price', 'N/A')
                                         area_code = row.get('zip', 'N/A')
-                                        st.markdown(
-                                            f"**Zimmer:** {rooms if rooms is not None else 'N/A'} \n"
-                                            f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m² \n"
-                                            f"**Preis:** CHF {price_per_month} pro Monat \n"
-                                            f"**Adresse:** {area_code}")
+                                        
                                         # Formatierung der Immobilieninformationen
                                 st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
                                 st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
