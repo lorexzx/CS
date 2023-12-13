@@ -159,24 +159,20 @@ def extract_zip_from_address(address):
 
     # Check for non-specific input
     if address.lower().strip() in non_specific_inputs:
-        return "non-specific"
+        return default_lat, default_lon  # You can choose to handle non-specific inputs differently
 
     # If the input is a specific zip code, use it as is
     if address.strip() in valid_st_gallen_zip_codes:
-        return address.strip()
+        return get_lat_lon_from_address_or_zip(address.strip())
 
-    # Otherwise, append ", St. Gallen" to localize the search
-    address += ", St. Gallen"
-
-    # Extract zip code from the full address
+    # Otherwise, try to geocode the address
     geolocator = Nominatim(user_agent="http")
-    location = geolocator.geocode(address, country_codes='CH')
+    location = geolocator.geocode(address + ", St. Gallen", country_codes='CH')
     if location:
-        address_components = location.raw.get('display_name', '').split(',')
-        for component in address_components:
-            if component.strip() in valid_st_gallen_zip_codes:
-                return component.strip()
-    return None
+        return location.latitude, location.longitude
+    else:
+        st.error("Invalid or missing zip code. Please enter a valid address or zip code in St. Gallen.")
+        return None, None  # Handle the case where the geocoding fails
 
 def get_lat_lon_from_address_or_zip(input_text):
     geolocator = Nominatim(user_agent="http")
