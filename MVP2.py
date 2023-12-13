@@ -219,25 +219,24 @@ def render_step(step, placeholder):
         if step == 0:
             # Step 1: Location
             address_input = st.text_input("Please enter an address or zip code in St. Gallen:", 
-                              value=st.session_state.get('address', ''), 
-                              key="address_input_step1")
-            st.session_state.address = address_input
+                                  value=st.session_state.get('address', ''), 
+                                  key="address_input_step1")
 
             if address_input:
                 processed_input = process_input(address_input)
                 st.session_state.address = processed_input
+                # Set the extracted_zip_code in session state
+                extracted_zip_code = extract_zip_code(processed_input)
+                st.session_state.extracted_zip_code = extracted_zip_code
 
                 try:
-                    # Attempt to get latitude and longitude
                     lat, lon = get_lat_lon_from_address_or_zip(processed_input)
                     popup_message = f"Location: {processed_input}"
                 except Exception:
-                    # Default to St. Gallen's coordinates on error
                     lat, lon = default_lat, default_lon
                     popup_message = "Error in location retrieval, showing default location."
 
             else:
-                # Default coordinates and message
                 lat, lon = default_lat, default_lon
                 popup_message = "Default Location in St. Gallen"
 
@@ -271,7 +270,7 @@ def render_step(step, placeholder):
 
             # Step 5: Result
         elif step == 4:
-                    if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                    if all(key in st.session_state for key in ['extracted_zip_code', 'rooms', 'size_m2']):
                         # Use st.session_state variables for prediction
                         if st.button('Predict Rental Price', key='predict_button'):
                             predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
