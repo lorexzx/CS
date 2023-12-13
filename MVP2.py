@@ -288,8 +288,8 @@ def render_step(step, placeholder):
                 lat, lon = default_lat, default_lon
                 popup_message = "Default Location in St. Gallen"
 
-            # Create and display the map
-            map = folium.Map(location=[lat, lon], zoom_start=16)
+            # Create and display the map with 'Stamen Toner' style
+            map = folium.Map(location=[lat, lon], zoom_start=16, tiles="Stamen Toner")
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
