@@ -36,7 +36,6 @@ from streamlit.proto.PlotlyChart_pb2 import PlotlyChart as PlotlyChartProto
 from streamlit.runtime.legacy_caching import caching
 from streamlit.runtime.metrics_util import gather_metrics
 
-import matplotlib
 import plotly.graph_objs as go
 from plotly.basedatatypes import BaseFigure
 
