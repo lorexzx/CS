@@ -238,73 +238,7 @@ def render_step(step, placeholder):
                         predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-
-
-def render_navigation_buttons(placeholder):
-    with placeholder.container():
-        if step == 0:
-            # Step 1: Location
-            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", 
-                                  value=st.session_state.get('address', ''), 
-                                  key="address_input_step1")
-
-            if address_input:
-                processed_input = process_input(address_input)
-                st.session_state.address = processed_input
-                # Set the extracted_zip_code in session state
-                extracted_zip_code = extract_zip_code(processed_input)
-                st.session_state.extracted_zip_code = extracted_zip_code
-
-                try:
-                    lat, lon = get_lat_lon_from_address_or_zip(processed_input)
-                    popup_message = f"Location: {processed_input}"
-                except Exception:
-                    lat, lon = default_lat, default_lon
-                    popup_message = "Error in location retrieval, showing default location."
-
-            else:
-                lat, lon = default_lat, default_lon
-                popup_message = "Default Location in St. Gallen"
-
-            # Create and display the map
-            map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
-            folium_static(map)
-        
-        
-        elif step == 1:
-            #step 2 rooms
-                # Calculate the index for the select box
-            rooms_index = st.session_state.get('rooms', 0)
-            rooms_index = rooms_index - 1 if rooms_index > 0 else 0
-            rooms_selection = st.selectbox("Select the number of rooms", 
-                                        range(1, 7), 
-                                        index=rooms_index, 
-                                        key='rooms_step2')
-            st.session_state.rooms = rooms_selection
-
-            # Step 3: Size
-        elif step == 2:
-                size_input = st.number_input("Enter the size in square meters", 
-                             min_value=0, 
-                             value=st.session_state.get('size_m2', 0), 
-                             key='size_m2_step3')
-                st.session_state.size_m2 = size_input
-            # Step 4: Current Rent
-        elif step == 3:
-                st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
-
-            # Step 5: Result
-        elif step == 4:  # Results step
-            if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-                if st.button('Predict Rental Price', key='predict_button'):
-                    extracted_zip_code = st.session_state.extracted_zip_code
-                    if extracted_zip_code is not None:
-                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
-                        if predicted_price is not None:
-                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-
-                            # Ähnliche Immobilien finden und anzeigen
+# Ähnliche Immobilien finden und anzeigen
                             similar_properties = find_similar_properties(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
@@ -327,7 +261,6 @@ def render_navigation_buttons(placeholder):
             else:
                 st.error("Please enter all required information in the previous steps.")
 
-
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
@@ -337,7 +270,7 @@ def render_navigation_buttons(placeholder):
             if st.button('Previous'):
                 st.session_state.current_step -= 1
                 placeholder.empty()  # Clear the previous content
-                _step(st.session_state.current_step, placeholdrenderer)
+                render_step(st.session_state.current_step, placeholder)
     
     with col2:
         if st.session_state.current_step < len(steps) - 1:
