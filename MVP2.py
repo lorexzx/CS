@@ -4,7 +4,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import joblib
 import folium
-from streamlit_folium import folium_static
+from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
 import plotly.graph_objects as go
