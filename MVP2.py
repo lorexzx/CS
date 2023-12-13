@@ -327,6 +327,14 @@ def render_step(step, placeholder):
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
+        # Anzeige der Benutzereingaben
+                            st.markdown(f"### Ihre Eingaben:")
+                            st.write(f"**Adresse oder Postleitzahl:** {st.session_state.address}")
+                            st.write(f"**Zimmer:** {st.session_state.rooms}")
+                            st.write(f"**Größe:** {st.session_state.size_m2} m²")
+                            st.write(f"**Aktuelle Miete:** CHF {st.session_state.current_rent}")
+
+
 # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
                             # Anpassung der Gauge-Werte
