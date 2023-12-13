@@ -6,15 +6,15 @@ import joblib
 import folium
 from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
+import re
 
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
 
-#ähnliche immobilien anzeigen
 def find_similar_properties(input_rooms, input_size, data, threshold=5):
     similar_properties = data[
-        (data['Rooms'].between(input_rooms - 1, input_rooms + 1)) &
-        (data['Size_m2'].between(input_size - threshold, input_size + threshold)) 
+        (data['rooms'].between(input_rooms - 1, input_rooms + 1)) &
+        (data['area'].between(input_size - threshold, input_size + threshold)) 
     ]
     return similar_properties
 
@@ -24,110 +24,66 @@ if 'current_step' not in st.session_state:
 if 'address' not in st.session_state:
     st.session_state.address = ""
 
-# Define functions to handle navigation
 def go_to_next_step():
     st.session_state.current_step += 1
 
 def go_to_previous_step():
     st.session_state.current_step -= 1
 
-# Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
-    # Load the dataset (replace with your actual file path)
-    real_estate_data = pd.read_excel('real-estate-scraped-data (1).xlsx')
+    file_path = 'Immobilienliste_20231212-220234.xlsx'
+    sorted_data = pd.read_excel('Immobilienliste_20231212-220234.xlsx')
 
+    sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
-    # Data Preprocessing
-    # Define the function to split 'Col3'
-    def split_column(row):
-        parts = row.split(' • ')
-        property_type = parts[0]
-        rooms = parts[1] if len(parts) > 1 else None
-        size_m2 = parts[2] if len(parts) > 2 else None
-        return {'Property_Type': property_type, 'Rooms': rooms, 'Size_m2': size_m2}
+    def extract_details(detail_str):
+        rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
+        area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
+        return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
 
-    # Apply the function to each row in 'Col3' and create a new DataFrame
-    split_data = real_estate_data['Col3'].apply(split_column).apply(pd.Series)
+    sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
-    # Cleaning and renaming columns
-    real_estate_data['area_code'] = real_estate_data['Col4'].str.extract(r'\b(\d{4})\b')
+    def convert_price(price_str):
+        price_str = re.sub(r'[^\d.]', '', price_str)
+        return float(price_str) if price_str else None
 
-    # Extracting numeric values from 'Col5' and 'Col6'
-    real_estate_data['price_per_month'] = real_estate_data['Col5'].str.extract(r'(\d+[\’\']?\d*)')[0].str.replace("’", "").str.replace("'", "").str.strip()
-    real_estate_data['price_per_m2_per_year'] = real_estate_data['Col6'].str.extract(r'(\d+[\’\']?\d*)')[0].str.replace("’", "").str.replace("'", "").str.strip()
+    sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
+    sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
-    # Remove 'Zi.' from 'Rooms' and 'm²' from 'Size_m2', with checks for non-string data
-    split_data['Rooms'] = split_data['Rooms'].str.replace(' Zi.', '').str.strip() if split_data['Rooms'].dtype == "object" else split_data['Rooms']
-    split_data['Size_m2'] = split_data['Size_m2'].str.replace(' m²', '').str.strip() if split_data['Size_m2'].dtype == "object" else split_data['Size_m2']
+    sorted_data.dropna(inplace=True)
 
-    # Concatenate the new DataFrame with the original one, now including cleaned columns
-    real_estate_data = pd.concat([split_data, real_estate_data.drop(columns=['Col3', 'Col4', 'Col5', 'Col6'])], axis=1)
-
-    # Rearrange columns
-    new_columns = ['Property_Type', 'Rooms', 'Size_m2', 'area_code', 'price_per_month', 'price_per_m2_per_year']
-    real_estate_data = real_estate_data[new_columns]
-
-    real_estate_data.dropna(inplace=True)
-
-    # Convert columns to numeric as necessary
-    real_estate_data['Rooms'] = pd.to_numeric(real_estate_data['Rooms'], errors='coerce')
-    real_estate_data['Size_m2'] = pd.to_numeric(real_estate_data['Size_m2'], errors='coerce')
-    real_estate_data['area_code'] = pd.to_numeric(real_estate_data['area_code'], errors='coerce')
-    real_estate_data['price_per_month'] = pd.to_numeric(real_estate_data['price_per_month'], errors='coerce')
-
-    # Drop any rows with NaN values
-    real_estate_data.dropna(inplace=True)
-
-    # Selecting features and target for the model
-    X = real_estate_data[['Rooms', 'Size_m2', 'area_code']]  # Example features
-    y = real_estate_data['price_per_month']  # Target variable
+    X = sorted_data[['rooms', 'area', 'area_code']]
+    y = sorted_data['Price']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    return model, real_estate_data
+    return model, sorted_data
 
 def extract_zip_code(input_text):
-    # Zerlegen des Strings anhand von Kommata oder Leerzeichen
     parts = input_text.replace(',', ' ').split()
-
-    # Durchsuchen der Teile nach einer Zahlenfolge
     for part in parts:
-        if part.isdigit() and len(part) == 4:  # Schweizer Postleitzahlen haben 4 Ziffern
+        if part.isdigit() and len(part) == 4:
             return part
-    return None  # Keine gültige Postleitzahl gefunden
+    return None
 
-#NEWER VERSION PRICE PREDICT NOT MY AEREA SO NOT SURE
 def predict_price(size_m2, extracted_zip_code, rooms, model):
-    # Ensure that size_m2 and rooms are numeric and non-negative
-    try:
-        size_m2 = float(size_m2)
-        rooms = int(rooms)
-        if size_m2 < 0 or rooms < 0:
-            raise ValueError("Size and rooms must be non-negative.")
-    except ValueError as e:
-        st.error(f"Invalid input for size or rooms: {e}")
-        return None
-
-    # Ensure that extracted_zip_code is a valid Swiss zip code (4 digits)
     try:
         area_code = int(extracted_zip_code)
-        if not (1000 <= area_code <= 9999):
-            raise ValueError("Invalid Swiss zip code.")
+        size_m2 = float(size_m2)
+        rooms = int(rooms)
     except ValueError as e:
-        st.error(f"Invalid zip code: {e}")
+        st.error(f"Invalid input: {e}")
         return None
 
-    # Create the input features DataFrame
     input_features = pd.DataFrame({
-        'Rooms': [rooms],
-        'Size_m2': [size_m2],
+        'rooms': [rooms],
+        'area': [size_m2],
         'area_code': [area_code]
     })
 
-    # Predict the price using the model
     predicted_price = model.predict(input_features)
     return predicted_price[0]
 
@@ -211,19 +167,80 @@ if 'current_step' not in st.session_state:
 # Preprocess data and train the model
 model, real_estate_data = preprocess_and_train()
 
-# Streamlit UI
 st.title("Rental Price Prediction")
 
-# Define the steps
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 
-# Initialize session state for current step and create a placeholder for content
 if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 step_content = st.empty()
 
-# Function to render the content of each step
 def render_step(step, placeholder):
+    with placeholder.container():
+        if step == 0:
+            # Step 1: Location
+            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", 
+                                  value=st.session_state.get('address', ''), 
+                                  key="address_input_step1")
+
+            if address_input:
+                processed_input = process_input(address_input)
+                st.session_state.address = processed_input
+                # Set the extracted_zip_code in session state
+                extracted_zip_code = extract_zip_code(processed_input)
+                st.session_state.extracted_zip_code = extracted_zip_code
+
+                try:
+                    lat, lon = get_lat_lon_from_address_or_zip(processed_input)
+                    popup_message = f"Location: {processed_input}"
+                except Exception:
+                    lat, lon = default_lat, default_lon
+                    popup_message = "Error in location retrieval, showing default location."
+
+            else:
+                lat, lon = default_lat, default_lon
+                popup_message = "Default Location in St. Gallen"
+
+            # Create and display the map
+            map = folium.Map(location=[lat, lon], zoom_start=16)
+            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
+            folium_static(map)
+        
+        
+        elif step == 1:
+            #step 2 rooms
+                # Calculate the index for the select box
+            rooms_index = st.session_state.get('rooms', 0)
+            rooms_index = rooms_index - 1 if rooms_index > 0 else 0
+            rooms_selection = st.selectbox("Select the number of rooms", 
+                                        range(1, 7), 
+                                        index=rooms_index, 
+                                        key='rooms_step2')
+            st.session_state.rooms = rooms_selection
+
+            # Step 3: Size
+        elif step == 2:
+                size_input = st.number_input("Enter the size in square meters", 
+                             min_value=0, 
+                             value=st.session_state.get('size_m2', 0), 
+                             key='size_m2_step3')
+                st.session_state.size_m2 = size_input
+            # Step 4: Current Rent
+        elif step == 3:
+                st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
+
+            # Step 5: Result
+        elif step == 4:  # Results step
+            if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                if st.button('Predict Rental Price', key='predict_button'):
+                    extracted_zip_code = st.session_state.extracted_zip_code
+                    if extracted_zip_code is not None:
+                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                        if predicted_price is not None:
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+
+
+def render_navigation_buttons(placeholder):
     with placeholder.container():
         if step == 0:
             # Step 1: Location
@@ -320,7 +337,7 @@ def render_navigation_buttons(placeholder):
             if st.button('Previous'):
                 st.session_state.current_step -= 1
                 placeholder.empty()  # Clear the previous content
-                render_step(st.session_state.current_step, placeholder)
+                _step(st.session_state.current_step, placeholdrenderer)
     
     with col2:
         if st.session_state.current_step < len(steps) - 1:
@@ -331,6 +348,4 @@ def render_navigation_buttons(placeholder):
 
 # Call the render_step function with the current step and the placeholder
 render_step(st.session_state.current_step, step_content)
-
-# Render the navigation buttons, pass the placeholder as well
 render_navigation_buttons(step_content)
