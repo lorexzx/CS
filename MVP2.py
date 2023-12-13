@@ -289,7 +289,7 @@ def render_step(step, placeholder):
                 popup_message = "Default Location in St. Gallen"
 
             # Create and display the map
-            map = folium.Map(location=[lat, lon], zoom_start=16, )
+            map = folium.Map(location=[lat, lon], zoom_start=16)
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
@@ -325,7 +325,7 @@ def render_step(step, placeholder):
                         predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
-                            
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
         # Anzeige der Benutzereingaben
                             st.markdown(f"### Ihre Eingaben:")
@@ -334,7 +334,7 @@ def render_step(step, placeholder):
                             st.write(f"**Größe:** {st.session_state.size_m2} m²")
                             st.write(f"**Aktuelle Miete:** CHF {st.session_state.current_rent}")
         # Anzeige des vorhergesagten Preises direkt unter den Benutzereingaben
-                            st.write(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**")
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
 
 # Plotly-Diagramm
