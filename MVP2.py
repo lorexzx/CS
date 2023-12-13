@@ -11,12 +11,24 @@ import re
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
 
-def find_similar_properties(input_rooms, input_size, data, threshold=5):
+def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
+    # Using the 'Details' column to extract rooms and area, then comparing with input
     similar_properties = data[
-        (data['rooms'].between(input_rooms - 1, input_rooms + 1)) &
-        (data['area'].between(input_size - threshold, input_size + threshold)) 
+        data.apply(lambda row: is_similar_property(row['Details'], input_rooms, input_size, threshold), axis=1)
     ]
     return similar_properties
+
+def is_similar_property(details, input_rooms, input_size, threshold):
+    # Extracting rooms and area from the 'Details' column
+    rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details)
+    area_match = re.search(r'(\d+(\.\d+)?) m²', details)
+
+    if rooms_match and area_match:
+        rooms = float(rooms_match.group(1))
+        area = float(area_match.group(1))
+        return (rooms >= input_rooms - 1 and rooms <= input_rooms + 1) and (area >= input_size - threshold and area <= input_size + threshold)
+    return False
+
 
 # Initialize session state variables
 if 'current_step' not in st.session_state:
@@ -239,7 +251,7 @@ def render_step(step, placeholder):
                         if predicted_price is not None:
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 # Ähnliche Immobilien finden und anzeigen
-                            similar_properties = find_similar_properties(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
                                 col1, col2 = st.columns(2)
@@ -247,13 +259,24 @@ def render_step(step, placeholder):
                                 for index, row in similar_properties.head(6).iterrows():
                                     current_col = col1 if index % 2 == 0 else col2
                                     with current_col:
-                                        st.markdown(f"**Typ:** {row['Property_Type']} \n"
-                                                    f"**Zimmer:** {row['Rooms']} \n"
-                                                    f"**Größe:** {row['Size_m2']} m² \n"
-                                                    f"**Preis:** CHF {row['price_per_month']} pro Monat \n"
-                                                    f"**Adresse:** {row['area_code']}")
+                                        # Anpassen der Markierungen, um die neuen Spaltennamen zu verwenden
+                                        # 'Property_Type' wird durch eine Kombination aus 'Name' und 'Details' ersetzt
+                                        # 'Rooms' und 'Size_m2' werden direkt aus 'Details' extrahiert
+                                        # 'price_per_month' wird durch 'Price' ersetzt
+                                        # 'area_code' wird aus der Spalte 'zip' extrahiert
+                                        property_type = f"{row['Name']} - {row['Details']}"
+                                        rooms, size_m2 = extract_rooms_and_size(row['Details'])
+                                        price_per_month = row['Price']
+                                        area_code = row['zip']
+                                        
+                                        st.markdown(f"**Typ:** {property_type} \n"
+                                                    f"**Zimmer:** {rooms} \n"
+                                                    f"**Größe:** {size_m2} m² \n"
+                                                    f"**Preis:** CHF {price_per_month} pro Monat \n"
+                                                    f"**Adresse:** {area_code}")
                             else:
                                 st.write("Keine ähnlichen Immobilien gefunden.")
+
                         else:
                             st.error("Unable to predict price. Please check your inputs.")
                     else:
