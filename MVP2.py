@@ -263,11 +263,9 @@ def render_step(step, placeholder):
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
                                 col1, col2 = st.columns(2)
-
                                 for index, row in similar_properties.head(6).iterrows():
                                     current_col = col1 if index % 2 == 0 else col2
                                     with current_col:
-                                        
                                         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
                                         price_per_month = row.get('Price', 'N/A')
                                         area_code = row.get('zip', 'N/A')
