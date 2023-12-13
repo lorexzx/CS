@@ -37,9 +37,19 @@ def preprocess_and_train():
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
     def extract_details(detail_str):
+        if pd.isna(detail_str):
+            return None, None  # Rückgabe von None, wenn der Eintrag fehlt
+
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
         return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
+
+
+    # Testen der Funktion mit einem Beispieldatensatz
+    test_string = "Wohnung • 4.5 Zi. • 99 m²"
+    rooms, area = extract_details(test_string)
+    print(f"Zimmer: {rooms}, Fläche: {area}")
+
 
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
