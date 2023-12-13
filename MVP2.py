@@ -301,11 +301,8 @@ def render_step(step, placeholder):
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
-                                # Jede Immobilie in zwei Spalten anzeigen
+                                col1, col2 = st.columns(2)
                                 for index, row in similar_properties.head(6).iterrows():
-                                    if index % 2 == 0:
-                                        col1, col2 = st.columns(2)
-                                    
                                     current_col = col1 if index % 2 == 0 else col2
                                     with current_col:
                                         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
