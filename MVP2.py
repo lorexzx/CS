@@ -216,7 +216,7 @@ def render_step(step, placeholder):
             lat, lon = default_lat, default_lon
             popup_message = "Default Location"
 
-            # Update the coordinates and popup message if an address is entered
+            # Update the coordinates and popup message if an address or zip code is entered
             if address_input:
                 processed_address = process_address_input(address_input)
                 st.session_state.address = processed_address
@@ -224,6 +224,10 @@ def render_step(step, placeholder):
                 st.session_state.extracted_zip_code = extracted_zip_code
 
                 if extracted_zip_code:
+                    # Check if the input is a zip code and process accordingly
+                    if extracted_zip_code.isdigit() and len(extracted_zip_code) == 4:
+                        # Localize zip code to St. Gallen
+                        processed_address += ", St. Gallen, Switzerland"
                     lat, lon = get_lat_lon_from_address_or_zip(processed_address)
                     popup_message = f"Eingegebene Adresse: {processed_address}"
                 else:
@@ -263,7 +267,7 @@ def render_step(step, placeholder):
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
-   
+  
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
