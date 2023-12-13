@@ -7,8 +7,53 @@ import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
-import matplotlib as mp
-import plotly.graph_objs as go
+# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Streamlit support for Plotly charts."""
+
+import json
+import urllib.parse
+from typing import TYPE_CHECKING, Any, Dict, List, Set, Union, cast
+
+from typing_extensions import Final, Literal, TypeAlias
+
+from streamlit import type_util
+from streamlit.errors import StreamlitAPIException
+from streamlit.logger import get_logger
+from streamlit.proto.PlotlyChart_pb2 import PlotlyChart as PlotlyChartProto
+from streamlit.runtime.legacy_caching import caching
+from streamlit.runtime.metrics_util import gather_metrics
+
+if TYPE_CHECKING:
+    import matplotlib
+    import plotly.graph_objs as go
+    from plotly.basedatatypes import BaseFigure
+
+    from streamlit.delta_generator import DeltaGenerator
+
+
+try:
+    import plotly.io as pio
+
+    import streamlit.elements.lib.streamlit_plotly_theme
+
+    pio.templates.default = "streamlit"
+except ModuleNotFoundError:
+    # We have imports here because it takes too loo long to load the template default for the first graph to load
+    # We do nothing if Plotly is not installed. This is expected since Plotly is an optional dependency.
+    pass
 
 # Setzen Sie das Plotly-Standard-Design
 pio.templates.default = 'plotly'
