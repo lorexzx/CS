@@ -8,7 +8,10 @@ from streamlit_folium import folium_static
 from geopy.geocoders import Nominatim
 import re
 
-import plotly.graph_objects as go
+import plotly.io as pio
+
+# Setzen Sie das Plotly-Standard-Design
+pio.templates.default = 'plotly'
 
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
