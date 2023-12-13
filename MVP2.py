@@ -56,7 +56,7 @@ except ModuleNotFoundError:
     pass
 
 # Setzen Sie das Plotly-Standard-Design
-pio.templates.default = 'plotly'
+
 
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
