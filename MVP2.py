@@ -10,6 +10,14 @@ from geopy.geocoders import Nominatim
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
 
+#ähnliche immobilien anzeigen
+def find_similar_properties(input_rooms, input_size, data, threshold=5):
+    similar_properties = data[
+        (data['Rooms'].between(input_rooms - 1, input_rooms + 1)) &
+        (data['Size_m2'].between(input_size - threshold, input_size + threshold)) 
+    ]
+    return similar_properties
+
 # Initialize session state variables
 if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
@@ -269,21 +277,38 @@ def render_step(step, placeholder):
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
             # Step 5: Result
-        elif step == 4:
-                    if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-                        # Use st.session_state variables for prediction
-                        if st.button('Predict Rental Price', key='predict_button'):
-                            extracted_zip_code = st.session_state.extracted_zip_code
-                            if extracted_zip_code is not None:
-                                predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
-                                if predicted_price is not None:
-                                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
-                                else:
-                                    st.error("Unable to predict price. Please check your inputs.")
+        elif step == 4:  # Results step
+            if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                if st.button('Predict Rental Price', key='predict_button'):
+                    extracted_zip_code = st.session_state.extracted_zip_code
+                    if extracted_zip_code is not None:
+                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                        if predicted_price is not None:
+                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+
+                            # Ähnliche Immobilien finden und anzeigen
+                            similar_properties = find_similar_properties(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            if not similar_properties.empty:
+                                st.markdown("### Ähnliche Immobilien:")
+                                col1, col2 = st.columns(2)
+
+                                for index, row in similar_properties.head(6).iterrows():
+                                    current_col = col1 if index % 2 == 0 else col2
+                                    with current_col:
+                                        st.markdown(f"**Typ:** {row['Property_Type']} \n"
+                                                    f"**Zimmer:** {row['Rooms']} \n"
+                                                    f"**Größe:** {row['Size_m2']} m² \n"
+                                                    f"**Preis:** CHF {row['price_per_month']} pro Monat \n"
+                                                    f"**Adresse:** {row['area_code']}")
                             else:
-                                st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
+                                st.write("Keine ähnlichen Immobilien gefunden.")
+                        else:
+                            st.error("Unable to predict price. Please check your inputs.")
                     else:
-                        st.error("Please enter all required information in the previous steps.")
+                        st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
+            else:
+                st.error("Please enter all required information in the previous steps.")
+
 
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
