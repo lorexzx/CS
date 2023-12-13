@@ -209,7 +209,7 @@ if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 
 # Preprocess data and train the model
-model = preprocess_and_train()
+model, real_estate_data = preprocess_and_train()
 
 # Streamlit UI
 st.title("Rental Price Prediction")
