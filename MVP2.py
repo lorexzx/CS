@@ -286,6 +286,15 @@ def render_step(step, placeholder):
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
             # Step 5: Result
+                def display_property_details(row):
+                                rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+                                price_per_month = row.get('Price', 'N/A')
+                                area_code = row.get('zip', 'N/A')
+                                
+                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
+                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
+                                st.write(f"**Adresse:** {area_code}")
        # Step 5: Result
         elif step == 4:  # Results step
             if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
@@ -319,16 +328,7 @@ def render_step(step, placeholder):
                             else:
                                 st.write("Keine ähnlichen Immobilien gefunden.")
 
-                            def display_property_details(row):
-                                rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
-                                price_per_month = row.get('Price', 'N/A')
-                                area_code = row.get('zip', 'N/A')
-                                
-                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
-                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
-                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
-                                st.write(f"**Adresse:** {area_code}")
-                                
+
                             # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
                             # Anpassung der Gauge-Werte
