@@ -11,10 +11,10 @@ import re
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
 
-def find_similar_properties(input_rooms, input_area, data, threshold=5):
+def find_similar_properties(input_rooms, input_size, data, threshold=5):
     similar_properties = data[
         (data['rooms'].between(input_rooms - 1, input_rooms + 1)) &
-        (data['area'].between(input_area - threshold, input_area + threshold)) 
+        (data['area'].between(input_size - threshold, input_size + threshold)) 
     ]
     return similar_properties
 
@@ -37,19 +37,9 @@ def preprocess_and_train():
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
     def extract_details(detail_str):
-        if pd.isna(detail_str):
-            return None, None  # Rückgabe von None, wenn der Eintrag fehlt
-
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
         return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
-
-
-    # Testen der Funktion mit einem Beispieldatensatz
-    test_string = "Wohnung • 4.5 Zi. • 99 m²"
-    rooms, area = extract_details(test_string)
-    print(f"Zimmer: {rooms}, Fläche: {area}")
-
 
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
@@ -57,20 +47,16 @@ def preprocess_and_train():
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
 
-    # Daten vorbereiten
-    real_estate_data['rooms'], real_estate_data['area'] = zip(*real_estate_data['Details'].apply(extract_details))
-    real_estate_data['price'] = real_estate_data['Price'].apply(convert_price)
-    real_estate_data['area_code'] = real_estate_data['zip'].str.extract(r'(\d{4})')
+    sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
+    sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
-    # Entfernen von Zeilen mit fehlenden Daten
-    real_estate_data.dropna(subset=['rooms', 'area', 'price', 'area_code'], inplace=True)
+    sorted_data.dropna(inplace=True)
 
-    # Trainingsdaten vorbereiten
-    X = real_estate_data[['rooms', 'area', 'area_code']]
-    y = real_estate_data['price']
+    X = sorted_data[['rooms', 'area', 'area_code']]
+    y = sorted_data['Price']
 
-    # Modelltraining
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     model = LinearRegression()
     model.fit(X_train, y_train)
 
