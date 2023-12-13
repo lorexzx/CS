@@ -36,24 +36,13 @@ from streamlit.proto.PlotlyChart_pb2 import PlotlyChart as PlotlyChartProto
 from streamlit.runtime.legacy_caching import caching
 from streamlit.runtime.metrics_util import gather_metrics
 
-if TYPE_CHECKING:
-    import matplotlib
-    import plotly.graph_objs as go
-    from plotly.basedatatypes import BaseFigure
+import matplotlib
+import plotly.graph_objs as go
+from plotly.basedatatypes import BaseFigure
 
-    from streamlit.delta_generator import DeltaGenerator
+from streamlit.delta_generator import DeltaGenerator
 
 
-try:
-    import plotly.io as pio
-
-    import streamlit.elements.lib.streamlit_plotly_theme
-
-    pio.templates.default = "streamlit"
-except ModuleNotFoundError:
-    # We have imports here because it takes too loo long to load the template default for the first graph to load
-    # We do nothing if Plotly is not installed. This is expected since Plotly is an optional dependency.
-    pass
 
 # Setzen Sie das Plotly-Standard-Design
 
