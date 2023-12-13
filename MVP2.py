@@ -321,7 +321,7 @@ def render_step(step, placeholder):
                         predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
-                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                            st.write(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**")
 
         # Anzeige der Benutzereingaben
                             st.markdown(f"### Ihre Eingaben:")
