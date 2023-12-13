@@ -337,7 +337,7 @@ def render_step(step, placeholder):
                             one_third_point = min_gauge_value + (1/3) * (max_gauge_value - min_gauge_value)
                             one_four_point_five_range = (1/4.5) * (max_gauge_value - min_gauge_value)
 
-                            fig = go.Figure(go.Indicator(
+                            fig = pio.Figure(pio.Indicator(
                                 mode = "gauge+number+delta",
                                 value = current_rent_step4,
                                 domain = {'x': [0, 1], 'y': [0, 1]},
