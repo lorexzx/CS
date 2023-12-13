@@ -40,9 +40,6 @@ from plotly.basedatatypes import BaseFigure
 
 from streamlit.delta_generator import DeltaGenerator
 
-from streamlit_folium import folium_static
-folium_static(map)
-
 
 
 # Setzen Sie das Plotly-Standard-Design
@@ -281,12 +278,11 @@ def render_step(step, placeholder):
                 st.session_state.extracted_zip_code = extracted_zip_code
 
                 try:
-                    map = folium.Map(location=[lat, lon], zoom_start=16, tiles="Stamen Toner")
-                    folium.Marker([lat, lon], popup=popup_message).add_to(map)
-                    folium_static(map)
-                except Exception as e:
-                    st.error(f"An error occurred when creating the map: {e}")
-
+                    lat, lon = get_lat_lon_from_address_or_zip(processed_input)
+                    popup_message = f"Location: {processed_input}"
+                except Exception:
+                    lat, lon = default_lat, default_lon
+                    popup_message = "Error in location retrieval, showing default location."
 
 
             else:
@@ -294,7 +290,7 @@ def render_step(step, placeholder):
                 popup_message = "Default Location in St. Gallen"
 
             # Create and display the map with 'Stamen Toner' style
-            map = folium.Map(location=[lat, lon], zoom_start=16)
+            map = folium.Map(location=[lat, lon], zoom_start=16, tiles="Stamen Toner", attr="Map data © OpenStreetMap contributors")
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
