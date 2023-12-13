@@ -249,11 +249,14 @@ def render_step(step, placeholder):
         
         elif step == 1:
             #step 2 rooms
-                rooms_selection = st.selectbox("Select the number of rooms", 
-                               range(1, 7), 
-                               index=st.session_state.get('rooms', 0) - 1, 
-                               key='rooms_step2')
-                st.session_state.rooms = rooms_selection
+                # Calculate the index for the select box
+            rooms_index = st.session_state.get('rooms', 0)
+            rooms_index = rooms_index - 1 if rooms_index > 0 else 0
+            rooms_selection = st.selectbox("Select the number of rooms", 
+                                        range(1, 7), 
+                                        index=rooms_index, 
+                                        key='rooms_step2')
+            st.session_state.rooms = rooms_selection
 
             # Step 3: Size
         elif step == 2:
