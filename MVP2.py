@@ -34,7 +34,7 @@ def go_to_previous_step():
 # Backend Code: Data Preprocessing and Model Training
 def preprocess_and_train():
     # Load the dataset (replace with your actual file path)
-    real_estate_data = pd.read_excel('real-estate-scraped-data.xlsx')
+    real_estate_data = pd.read_excel('real-estate-scraped-data (1).xlsx')
 
     # Data Preprocessing
     # Define the function to split 'Col3'
@@ -287,7 +287,7 @@ def render_step(step, placeholder):
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
                             # Ähnliche Immobilien finden und anzeigen
-                            similar_properties = find_similar_properties(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            similar_properties = find_similar_properties(st.session_state.rooms, st.session_state.size_m2, real-estate-scraped-data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
                                 col1, col2 = st.columns(2)
