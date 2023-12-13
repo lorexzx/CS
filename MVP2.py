@@ -310,10 +310,10 @@ def render_step(step, placeholder):
                                         area_code = row.get('zip', 'N/A')
                                         
                                         # Formatierung der Immobilieninformationen
-                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
-                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
-                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
-                                st.write(f"**Adresse:** {area_code}")
+                                    st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
+                                    st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+                                    st.write(f"**Preis:** CHF {price_per_month} pro Monat")
+                                    st.write(f"**Adresse:** {area_code}")
                             else:
                                 st.write("Keine ähnlichen Immobilien gefunden.")
 
