@@ -357,7 +357,8 @@ def render_step(step, placeholder):
                                     'threshold': {
                                         'line': {'color': "red", 'width': 4},
                                         'thickness': 0.75,
-                                        'value': predicted_price}}))
+                                        'value': predicted_price}
+                                }))
 
                             fig.update_layout(paper_bgcolor = "white", font = {'color': "darkblue", 'family': "Arial"})
                             st.plotly_chart(fig)
