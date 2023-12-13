@@ -273,13 +273,17 @@ def render_step(step, placeholder):
                     if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
                         # Use st.session_state variables for prediction
                         if st.button('Predict Rental Price', key='predict_button'):
-                            predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
-                            if predicted_price is not None:
-                                st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                            extracted_zip_code = st.session_state.extracted_zip_code
+                            if extracted_zip_code is not None:
+                                predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                                if predicted_price is not None:
+                                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                                else:
+                                    st.error("Unable to predict price. Please check your inputs.")
                             else:
-                                st.error("Unable to predict price. Please check your inputs.")
+                                st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
                     else:
-                            st.error("Please enter all required information in the previous steps.")
+                        st.error("Please enter all required information in the previous steps.")
 
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
