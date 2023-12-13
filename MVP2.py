@@ -301,21 +301,33 @@ def render_step(step, placeholder):
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
-                                col1, col2 = st.columns(2)
-                                for index, row in similar_properties.head(6).iterrows():
-                                    current_col = col1 if index % 2 == 0 else col2
-                                    with current_col:
-                                        rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
-                                        price_per_month = row.get('Price', 'N/A')
-                                        area_code = row.get('zip', 'N/A')
-                                        
-                                        # Formatierung der Immobilieninformationen
-                                    st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
-                                    st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
-                                    st.write(f"**Preis:** CHF {price_per_month} pro Monat")
-                                    st.write(f"**Adresse:** {area_code}")
+                                # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
+                                for index in range(0, len(similar_properties), 2):
+                                    col1, col2 = st.columns(2)
+
+                                    # Zeige Immobilie in der ersten Spalte
+                                    if index < len(similar_properties):
+                                        row = similar_properties.iloc[index]
+                                        with col1:
+                                            display_property_details(row)
+
+                                    # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
+                                    if index + 1 < len(similar_properties):
+                                        row = similar_properties.iloc[index + 1]
+                                        with col2:
+                                            display_property_details(row)
                             else:
                                 st.write("Keine ähnlichen Immobilien gefunden.")
+
+                            def display_property_details(row):
+                                rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
+                                price_per_month = row.get('Price', 'N/A')
+                                area_code = row.get('zip', 'N/A')
+                                
+                                st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
+                                st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+                                st.write(f"**Preis:** CHF {price_per_month} pro Monat")
+                                st.write(f"**Adresse:** {area_code}")
 
                             # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
