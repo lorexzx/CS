@@ -244,8 +244,6 @@ def render_step(step, placeholder):
             map = folium.Map(location=[lat, lon], zoom_start=16)
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
-            # Debug print
-            print(f"Extracted ZIP Code: {st.session_state.extracted_zip_code}")
         
         
         elif step == 1:
@@ -272,7 +270,7 @@ def render_step(step, placeholder):
 
             # Step 5: Result
         elif step == 4:
-                    if all(key in st.session_state for key in ['extracted_zip_code', 'rooms', 'size_m2']):
+                    if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
                         # Use st.session_state variables for prediction
                         if st.button('Predict Rental Price', key='predict_button'):
                             predicted_price = predict_price(st.session_state.size_m2, st.session_state.extracted_zip_code, st.session_state.rooms, model)
