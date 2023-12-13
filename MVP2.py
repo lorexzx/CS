@@ -29,6 +29,13 @@ def is_similar_property(details, input_rooms, input_size, threshold):
         return (rooms >= input_rooms - 1 and rooms <= input_rooms + 1) and (area >= input_size - threshold and area <= input_size + threshold)
     return False
 
+def extract_rooms_and_size(details_str):
+    rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details_str)
+    size_match = re.search(r'(\d+(\.\d+)?) m²', details_str)
+    rooms = float(rooms_match.group(1)) if rooms_match else None
+    size = float(size_match.group(1)) if size_match else None
+    return rooms, size
+
 
 # Initialize session state variables
 if 'current_step' not in st.session_state:
