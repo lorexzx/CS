@@ -7,6 +7,7 @@ import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
+
 import plotly.graph_objects as go
 
 # Standard coordinates for St. Gallen
