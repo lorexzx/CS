@@ -316,7 +316,6 @@ def render_step(step, placeholder):
         elif step == 3:
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
-            # Step 5: Result
        # Step 5: Result
         elif step == 4:  # Results step
             if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
@@ -328,30 +327,7 @@ def render_step(step, placeholder):
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
                             st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
-                            # Ähnliche Immobilien finden und anzeigen
-                            similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
-                            if not similar_properties.empty:
-                                st.markdown("### Ähnliche Immobilien:")
-                                # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
-                                for index in range(0, len(similar_properties), 2):
-                                    col1, col2 = st.columns(2)
-
-                                    # Zeige Immobilie in der ersten Spalte
-                                    if index < len(similar_properties):
-                                        row = similar_properties.iloc[index]
-                                        with col1:
-                                            display_property_details(row)
-
-                                    # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
-                                    if index + 1 < len(similar_properties):
-                                        row = similar_properties.iloc[index + 1]
-                                        with col2:
-                                            display_property_details(row)
-                            else:
-                                st.write("Keine ähnlichen Immobilien gefunden.")
-
-
-                            # Plotly-Diagramm
+# Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
                             # Anpassung der Gauge-Werte
                             min_gauge_value = 0.9 * predicted_price
@@ -382,8 +358,31 @@ def render_step(step, placeholder):
                                         'value': predicted_price}
                                 }))
 
-                            fig.update_layout(paper_bgcolor = "white", font = {'color': "darkblue", 'family': "Arial"})
+                            fig.update_layout(paper_bgcolor = "white", font = {'color': "black", 'family': "Arial"})
                             st.plotly_chart(fig)
+
+                            # Ähnliche Immobilien finden und anzeigen
+                            similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                            if not similar_properties.empty:
+                                st.markdown("### Ähnliche Immobilien:")
+                                # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
+                                for index in range(0, len(similar_properties), 2):
+                                    col1, col2 = st.columns(2)
+
+                                    # Zeige Immobilie in der ersten Spalte
+                                    if index < len(similar_properties):
+                                        row = similar_properties.iloc[index]
+                                        with col1:
+                                            display_property_details(row)
+
+                                    # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
+                                    if index + 1 < len(similar_properties):
+                                        row = similar_properties.iloc[index + 1]
+                                        with col2:
+                                            display_property_details(row)
+                            else:
+                                st.write("Keine ähnlichen Immobilien gefunden.")
+
                         else:
                             st.error("Unable to predict price. Please check your inputs.")
                     else:
