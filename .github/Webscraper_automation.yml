@@ -27,10 +27,11 @@ on:
     - name: Run Python Webscraper
       run: python webscraper.py 
 
-    - name: Commit and push if changes
-      run: |
-        git config --global user.email "lorenzlobo2@web.de"
-        git config --global user.name "lorexzx"
-        git add immobilienliste.xlsx
-        git commit -m "Update file" || echo "No changes to commit"
-        git push
+    #- name: Commit and push if changes
+    #  run: |
+    #    git config --global user.email "lorenzlobo2@web.de"
+    #    git config --global user.name "lorexzx"
+    #    git add immobilienliste.xlsx
+    #    git commit -m "Update file" || echo "No changes to commit"
+    #    git push
+    # Nicht sicher ob das notwendig ist, weil der scraper schon selber die Datei updatet
