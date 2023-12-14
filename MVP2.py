@@ -303,7 +303,7 @@ def display_property_details(row):
             st.write("**Websites:** N/A")
 
         st.markdown('</div>', unsafe_allow_html=True)
-        
+
 """
 Citation: For the different steps here we used various snippets from different StackOverflow posts.
 """
@@ -390,7 +390,7 @@ def render_step(step, placeholder):
                             st.write(f"**Size:** {st.session_state.size_m2} m²")
                             st.write(f"**Current rent:** CHF {st.session_state.current_rent}")
 
-                           # Visualization with Plotly gauge chart
+                           # Visualazing the gauge
                             current_rent_step4 = st.session_state.current_rent
                             # Gauge value adjustments
                             min_gauge_value = 0.9 * predicted_price
@@ -424,15 +424,12 @@ def render_step(step, placeholder):
                             fig.update_layout(paper_bgcolor = "white", font = {'color': "black", 'family': "Arial"})
                             st.plotly_chart(fig)
 
-                            # Find and display similar properties
+                            # Find and display similar properties in two columns
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Find similar properties:")
-                                # Iterate over each property and display it in two columns
                                 for index in range(0, len(similar_properties), 2):
                                     col1, col2 = st.columns(2)
-
-                                    # Show similar properties in the first column
                                     if index < len(similar_properties):
                                         row = similar_properties.iloc[index]
                                         with col1:
