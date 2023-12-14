@@ -1,8 +1,3 @@
-"""
-Our requirements file ensures that essential libraries such as Streamlit, Pandas, scikit-learn, 
-and others are automatically installed to enable our code to function correctly when running the Streamlit app.
-"""
-
 streamlit==1.28.2
 pandas==2.1.4
 scikit-learn==1.3.2
