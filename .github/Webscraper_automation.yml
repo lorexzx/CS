@@ -5,9 +5,12 @@ on:
     branches:
       - patch-1
   schedule:
-    - cron: '03 19 * * *' # Runs every day at ..:.. mm hh
+    - cron: '25 19 * * *' # Runs every day at ..:.. mm hh
 
-    jobs:
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+jobs:
   run-script-and-update-file:
     runs-on: ubuntu-latest
 
@@ -25,7 +28,7 @@ on:
         pip install -r requirements.txt 
 
     - name: Run Python Webscraper
-        run: python webscraper.py  # Replace with the path to your scraper
+      run: python webscraper.py  # Replace with the path to your scraper
 
       - name: Commit and push if changes
         run: |
