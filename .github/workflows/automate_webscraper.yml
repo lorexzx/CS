@@ -3,7 +3,7 @@ name: Run Python Webscraper and Update Database (Workflow) #Name of the workflow
 #What triggers the workflow
 on:
   schedule:
-    - cron: '56 21 * * *' # Runs every day at 00:00 UTC+1
+    - cron: '59 19 * * *' # Runs every day at 00:00 UTC+1
 
 jobs:
   run-script-and-update-file:
