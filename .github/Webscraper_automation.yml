@@ -5,7 +5,7 @@ on:
     branches:
       - patch-1
   schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight
+    - cron: '35 18 * * *' # Runs every day at midnight
 
     jobs:
   run-script-and-update-file:
