@@ -5,7 +5,7 @@ on:
     branches:
       - patch-1
   schedule:
-    - cron: '30 19 * * *' # Runs every day at ..:.. mm hh
+    - cron: '33 19 * * *' # Runs every day at 19:30 UTC
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -15,25 +15,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.11.5'
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.11.5'
 
-    - name: Install dependencies
-      run: |
-        pip install -r requirements.txt 
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt 
 
-    - name: Run Python Webscraper
-      run: python webscraper.py  # Replace with the path to your scraper
+      - name: Run Python Webscraper
+        run: python webscraper.py  # Replace with the path to your scraper
 
       - name: Commit and push if changes
         run: |
           git config --global user.email "lorenzlobo2@web.de"
           git config --global user.name "lorexzx"
           git add Immobilienliste.xlsx
-          git commit -m "Update Immobilienliste" -a || echo "No changes to commit"
+          git commit -m "Update Immobilienliste" || echo "No changes to commit"
           git push
