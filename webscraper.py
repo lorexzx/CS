@@ -81,6 +81,6 @@ for page in range(1,2):  # Ändern Sie 5 auf die tatsächliche Anzahl der Seiten
 # Zusammenführen aller Daten in einem DataFrame
 df = pd.concat(all_data, ignore_index=True)
 
-# Speichern des DataFrames in einer festen Excel-Datei
-file_path = '/Users/maxgrau/Desktop/CS/Immobilienliste.xlsx'
+#Save file in relative path
+file_path = 'Immobilienliste.xlsx'  # Relative path
 df.to_excel(file_path, index=False)
