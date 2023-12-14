@@ -1,37 +1,39 @@
 name: Run Python Webscraper and Update Database (Workflow) #Name of the workflow, this is displayed in GitHub Actions
 
-#What triggers the workflow
+# THis is the trigger that executes the workflow
 on:
   schedule:
     - cron: '20 20 * * *' # Runs every day at 00:00 UTC+1
 
+  # This environment variable allows certain commands that may otherwise be restricted due to security
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
 
+# This is what the workflow actually does
 jobs:
   run-script-and-update-file:
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-latest # Runs the workflow in an ubuntu virtual machine
+# this enables the workflow to check out patch-1 of the repository so that it can access the branches contents
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-
+# Sets up python
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.11.5'
-
+# Installs all dependencies from the requirements.txt file in the repository
       - name: Install dependencies
         run: |
           pip install -r requirements.txt 
-
+# This executes the python program "webscraper.py", our webscraper
       - name: Run Python Webscraper
         run: python webscraper.py  # Replace with the path to your scraper
-
+# The workflow now overrides "Immobilienliste.xlsx" and commits the changes along with a message. If there are no changes, the command will print "No changes to commit" to the workflow's log.
       - name: Commit and push if changes
         run: |
           git config --global user.email "lorenzlobo2@web.de"
           git config --global user.name "lorexzx"
           git add Immobilienliste.xlsx
-          git commit -m "Update Immobilienliste" || echo "No changes to commit"
+          git commit -m "Updated Immobilienliste via Workflow" || echo "No changes to commit"
           git push
