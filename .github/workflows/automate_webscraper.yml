@@ -5,7 +5,7 @@ on:
     branches:
       - patch-1
   schedule:
-    - cron: '33 19 * * *' # Runs every day at 19:30 UTC
+    - cron: '40 19 * * *' # Runs every day at 19:30 UTC
 
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
