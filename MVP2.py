@@ -320,7 +320,7 @@ def render_step(step, placeholder):
         elif step == 3:
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
-       # Step 5: Result
+            # Step 5: Result
         elif step == 4:  # Results step
             if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
                 if st.button('Predict Rental Price', key='predict_button'):
@@ -329,19 +329,16 @@ def render_step(step, placeholder):
                         predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
-                            st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                            st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
 
-        # Anzeige der Benutzereingaben
+                            # Anzeige der Benutzereingaben
                             st.markdown(f"### Ihre Eingaben:")
                             st.write(f"**Adresse oder Postleitzahl:** {st.session_state.address}")
                             st.write(f"**Zimmer:** {st.session_state.rooms}")
                             st.write(f"**Größe:** {st.session_state.size_m2} m²")
                             st.write(f"**Aktuelle Miete:** CHF {st.session_state.current_rent}")
-        # Anzeige des vorhergesagten Preises direkt unter den Benutzereingaben
-                            st.write(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**")
 
-
-# Plotly-Diagramm
+                            # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
                             # Anpassung der Gauge-Werte
                             min_gauge_value = 0.9 * predicted_price
