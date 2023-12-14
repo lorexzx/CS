@@ -55,8 +55,8 @@ def go_to_previous_step():
 
 def preprocess_and_train(): 
     global sorted_data
-    file_path = 'Immobilienliste.xlsx'
-    sorted_data = pd.read_excel('Immobilienliste.xlsx')
+    file_path = 'bitte.xlsx'
+    sorted_data = pd.read_excel('bitte.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
