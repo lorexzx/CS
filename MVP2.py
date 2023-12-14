@@ -108,6 +108,7 @@ def preprocess_and_train():
     sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
     sorted_data.dropna(inplace=True)
+    sorted_data['area_code'] = sorted_data['area_code'].astype(int)
     sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
     X = sorted_data[['rooms', 'area', 'latitude', 'longitude']]
     y = sorted_data['Price']
