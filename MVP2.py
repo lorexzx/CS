@@ -423,7 +423,7 @@ def render_step(step, placeholder):
                                         with col2:
                                             display_property_details(row)
                             else:
-                                st.write("Keine ähnlichen Immobilien gefunden.")
+                                st.write("No similar properties found.")
 
                         else:
                             st.error("Unable to predict price. Please check your inputs.")
