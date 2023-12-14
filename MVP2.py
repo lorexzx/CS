@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 import joblib
-import folium 
+import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
@@ -13,7 +13,7 @@ import plotly.graph_objs as go
 from plotly.basedatatypes import BaseFigure
 
 # Standard coordinates for St. Gallen
-default_lat, default_lon = 47.424482, 9.376717 
+default_lat, default_lon = 47.424482, 9.376717
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
     # Using the 'Details' column to extract rooms and area, then comparing with input
@@ -54,9 +54,8 @@ def go_to_previous_step():
     st.session_state.current_step -= 1
 
 def preprocess_and_train(): 
-    global sorted_data
-    file_path = 'bitte.xlsx'
-    sorted_data = pd.read_excel('bitte.xlsx')
+    file_path = 'Immobilienliste.xlsx'
+    sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
@@ -96,6 +95,28 @@ def extract_zip_code(input_text):
     return None
 
 def predict_price(size_m2, extracted_zip_code, rooms, model):
+
+    sorted_data = pd.read_excel('Immobilienliste.xlsx')
+
+    sorted_data.drop(columns=['Name', 'Description'], inplace=True)
+    coords_path = 'gallen_coord.csv'
+    coords_data = pd.read_csv(coords_path)
+    def extract_details(detail_str):
+        rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
+        area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
+        return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
+
+    sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
+    def convert_price(price_str):
+        price_str = re.sub(r'[^\d.]', '', price_str)
+        return float(price_str) if price_str else None
+
+    sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
+    sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
+
+    sorted_data.dropna(inplace=True)
+    sorted_data['area_code'] = sorted_data['area_code'].astype(int)
+    sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
