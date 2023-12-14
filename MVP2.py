@@ -54,8 +54,8 @@ def go_to_previous_step():
     st.session_state.current_step -= 1
 
 def preprocess_and_train(): 
-    file_path = 'Immobilienliste.xlsx'
-    sorted_data = pd.read_excel('Immobilienliste.xlsx')
+    file_path = 'bitte.xlsx'
+    sorted_data = pd.read_excel('bitte.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
@@ -96,7 +96,7 @@ def extract_zip_code(input_text):
 
 def predict_price(size_m2, extracted_zip_code, rooms, model):
 
-    sorted_data = pd.read_excel('Immobilienliste.xlsx')
+    sorted_data = pd.read_excel('bitte.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
