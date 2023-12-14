@@ -29,7 +29,7 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 
-def clean_price(price):
+def clean_price(price): 
     # Replace non-breaking spaces and remove hyphens from price
     return price.replace('\xa0', ' ').replace('-', '').strip()
 
