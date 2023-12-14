@@ -127,11 +127,20 @@ def extract_zip_code(input_text):
             return part
     return None
 
-def predict_price(size_m2, extracted_zip_code, rooms, model):
+def predict_price(size_m2, extracted_zip_code, rooms, model, sorted_data):
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
         rooms = int(rooms)
+
+        if area_code in sorted_data['area_code'].values:
+            area_data = sorted_data[sorted_data['area_code'] == area_code]
+            longitude = area_data.iloc[0]['longitude']
+            latitude = area_data.iloc[0]['latitude']
+        else:
+            st.error("Area code not found in mapping.")
+            return None
+    
     except ValueError as e:
         st.error(f"Invalid input: {e}")
         return None
@@ -139,7 +148,9 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
     input_features = pd.DataFrame({
         'rooms': [rooms],
         'area': [size_m2],
-        'area_code': [area_code]
+#        'area_code': [area_code]
+        'longitude': [longitude],
+        'latitude': [latitude]
     })
 
     predicted_price = model.predict(input_features)
