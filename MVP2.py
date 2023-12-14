@@ -3,42 +3,18 @@ This code is part of a Streamlit application designed to estimate fair rental va
 particularly useful for students assessing the fairness of their current or prospective rental accommodations. 
 The app is focused on the St. Gallen area and uses a linear regression model to make its predictions.
 
-The application, structured into various components, begins by importing necessary libraries including Streamlit for the web interface, 
-Pandas for data handling, Scikit-learn for the linear regression model and data splitting, joblib for model persistence, Folium for map rendering, 
-geopy for geolocation, and plotting libraries like matplotlib and plotly for visualization.
+Simplified overview of how the application works:
 
-Central to the app is the setting of standard coordinates for St. Gallen, which serve as default values in geolocation functions. 
-
-The app manages its state using Streamlit's session state features, storing variables like the user's current step in the process or their address input. 
-This is crucial for maintaining continuity as the user navigates through different tabs of the application.
-
-At the core is the preprocess_and_train function, responsible for reading and cleaning data from an Excel file, merging it with coordinate data, 
-splitting it for training and testing, and ultimately training the Linear Regression model. This model is the backbone of the application, 
-used in the predict_price function to predict rental prices based on user inputs like size, zip code, and number of rooms.
-
-Address processing is an integral part of the application, involving functions like extract_zip_code, extract_zip_from_address, 
-and get_lat_lon_from_address_or_zip. These functions collectively handle user input, whether it’s a direct address or a zip code, 
-and convert it into latitude and longitude coordinates for geolocation purposes.
-
-The Streamlit UI is dynamic and interactive, comprising functions like process_address_input, render_step, and render_navigation_buttons. 
-These manage the user interface, allowing for input of data, navigation across different steps, and displaying results and visualizations like maps 
-and property details. The display_property_details function is specifically designed to visually represent critical information about properties, 
-enhancing the user experience.
-
-Finally, the application is brought to life by executing the UI rendering functions, render_step and render_navigation_buttons. 
-These functions update the app based on user interactions, making the application not just functional but also engaging.
-
-In summary, this Streamlit application is a tool that leverages a linear regression model to provide valuable insights into rental prices in St. Gallen.
-It’s designed with a user-friendly interface, backed by robust data processing and machine learning, making it a useful resource for students assessing 
-rental accommodations. 
-
-Note: The application's effectiveness depends on the quality of the data used to train the model. 
+Data Handling: The app processes real estate data, focusing on properties in St. Gallen. This includes gathering details like room count, size, and price.
+Model Training: Using this data, a linear regression model is trained to understand the relationship between these property features and their rental prices.
+User Interaction: Students can interact with the app by entering details about a property they are interested in or currently renting. This includes specifics like the number of rooms, size, and location.
+Fair Price Estimation: The app then uses the trained model to predict a fair rental price for the given property, based on the inputted features.
+Visualization and Comparison: Additionally, the app may offer visualizations like maps and compare the predicted fair price with the actual price to help users determine if they are paying a reasonable amount.
 
 
+In summary, this code uses a linear regression model to provide valuable insights into rental prices in St. Gallen.
 
-
-
-
+Note: The effectiveness of the application depends on the quality of the data used to train the model.
 """
 
 import streamlit as st
@@ -314,7 +290,7 @@ def display_property_details(row):
         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
         price_per_month = row.get('Price', 'N/A')
         area_code = row.get('zip', 'N/A')
-        website = row.get('websiten', '')  # Neues Feld für Website hinzufügen
+        websites = row.get('websites', '')  # Neues Feld für Website hinzufügen
 
         # Displaying the extracted property details in English
         st.write(f"**Number of rooms:** {rooms if rooms is not None else 'N/A'}")
@@ -323,10 +299,10 @@ def display_property_details(row):
         st.write(f"**Location:** {area_code}")
 
         # Displaying the website if available
-        if website:
-            st.markdown(f"**Website:** [ {website} ](https://{website})", unsafe_allow_html=True)
+        if websites:
+            st.markdown(f"**Websites:** [ {websites} ](https://{websites})", unsafe_allow_html=True)
         else:
-            st.write("**Website:** N/A")
+            st.write("**Websites:** N/A")
 
         st.markdown('</div>', unsafe_allow_html=True)
 
