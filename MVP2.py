@@ -87,6 +87,7 @@ def go_to_previous_step():
     st.session_state.current_step -= 1
 
 def preprocess_and_train(): 
+    global sorted_data
     file_path = 'Immobilienliste.xlsx'
     sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
@@ -117,7 +118,7 @@ def preprocess_and_train():
 
     model = LinearRegression()
     model.fit(X_train, y_train)
-
+    
     return model, sorted_data
 
 def extract_zip_code(input_text):
@@ -127,7 +128,7 @@ def extract_zip_code(input_text):
             return part
     return None
 
-def predict_price(size_m2, extracted_zip_code, rooms, model, sorted_data):
+def predict_price(size_m2, extracted_zip_code, rooms, model):
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
@@ -280,7 +281,7 @@ def display_property_details(row):
         st.markdown('</div>', unsafe_allow_html=True)
 
 
-def render_step(step, placeholder, sorted_data):
+def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
             # Step 1: Location
@@ -356,7 +357,7 @@ def render_step(step, placeholder, sorted_data):
                     extracted_zip_code = st.session_state.extracted_zip_code
                     if extracted_zip_code is not None:
                         #predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model) krish
-                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model, sorted_data)
+                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
                             st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
