@@ -161,7 +161,7 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
         size_m2 = float(size_m2)
         rooms = int(rooms)
 
-        # Check if area code is in the data and get corresponding latitude and longitude
+        # Check if area code is in the data and get accordng latitude and longitude
         if area_code in sorted_data['area_code'].values:
             area_data = sorted_data[sorted_data['area_code'] == area_code]
             longitude = area_data.iloc[0]['longitude']
@@ -178,7 +178,6 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
     input_features = pd.DataFrame({
         'rooms': [rooms],
         'area': [size_m2],
-        #'area_code': [area_code]
         'latitude': [latitude],
         'longitude': [longitude],
         
@@ -192,7 +191,7 @@ def extract_zip_from_address(address):
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
     non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
 
-    # Handling non-specific inputs by returning default coordinates
+    # Handling non-specific inputs
     if address.lower().strip() in non_specific_inputs:
         return default_lat, default_lon  
 
@@ -200,7 +199,7 @@ def extract_zip_from_address(address):
     if address.strip() in valid_st_gallen_zip_codes:
         return get_lat_lon_from_address_or_zip(address.strip())
 
-    # For other inputs, try to geocode the address to get coordinates
+    # For other inputs, geocode the address to get coordinates
     geolocator = Nominatim(user_agent="http")
     location = geolocator.geocode(address + ", St. Gallen", country_codes='CH')
     if location:
@@ -243,7 +242,7 @@ def process_address_input(input_address):
 # Process the input text based on whether it's a zip code or a general address
 def process_input(input_text):
     if input_text.isdigit() and len(input_text) == 4:
-        return input_text + ", St. Gallen, Switzerland"# Process as zip code
+        return input_text + ", St. Gallen, Switzerland"
     else:
         return process_address_input(input_text)  # Process as ageneral address
 
@@ -265,7 +264,7 @@ if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 step_content = st.empty()
 
-# Embedding the CSS style for the property details display
+# Embedding the CSS style for the property details display (StackOverflow post snippet)
 def display_property_details(row):
     frame_style = """
     <style>
@@ -289,15 +288,15 @@ def display_property_details(row):
         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
         price_per_month = row.get('Price', 'N/A')
         area_code = row.get('zip', 'N/A')
-        websites = row.get('Websites', '')  # Neues Feld für Website hinzufügen
+        websites = row.get('Websites', '')  
 
-        # Displaying the extracted property details in English
+        # Displaying the extracted property details
         st.write(f"**Number of rooms:** {rooms if rooms is not None else 'N/A'}")
         st.write(f"**Size:** {size_m2 if size_m2 is not None else 'N/A'} m²")
         st.write(f"**Price:** CHF {price_per_month} per month")
         st.write(f"**Location:** {area_code}")
 
-        # Displaying the website if available
+        # Displaying the website
         if websites:
             st.markdown(f"**Websites:** [ {websites} ](https://{websites})", unsafe_allow_html=True)
         else:
@@ -350,7 +349,7 @@ def render_step(step, placeholder):
     
             rooms_index = st.session_state.get('rooms', 0)
              # Adjust the range of selectable room options
-            adjusted_rooms_list = [float(f"{i/2:.1f}") for i in range(2, 15)]  # Creates a list [1, 1.5, 2, ..., 7]
+            adjusted_rooms_list = [float(f"{i/2:.1f}") for i in range(2, 15)]  
             rooms_index = adjusted_rooms_list.index(rooms_index) if rooms_index in adjusted_rooms_list else 0
 
             rooms_selection = st.selectbox("Select the number of rooms", 
@@ -376,10 +375,9 @@ def render_step(step, placeholder):
                 if st.button('Predict Rental Price', key='predict_button'):
                     extracted_zip_code = st.session_state.extracted_zip_code
                     if extracted_zip_code is not None:
-                        #predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model) krish
                         predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
                         if predicted_price is not None:
-                            st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
+                            st.session_state.predicted_price = predicted_price 
                             st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
 
                             # Display user input for confirmation
@@ -389,9 +387,8 @@ def render_step(step, placeholder):
                             st.write(f"**Size:** {st.session_state.size_m2} m²")
                             st.write(f"**Current rent:** CHF {st.session_state.current_rent}")
 
-                           # Visualazing the gauge
+                           # Visualazing and value adjustments for gauge
                             current_rent_step4 = st.session_state.current_rent
-                            # Gauge value adjustments
                             min_gauge_value = 0.9 * predicted_price
                             max_gauge_value = 1.5 * predicted_price
                             one_third_point = min_gauge_value + (1/3) * (max_gauge_value - min_gauge_value)
