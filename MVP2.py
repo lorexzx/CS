@@ -26,12 +26,11 @@ from geopy.geocoders import Nominatim
 import re
 import plotly.graph_objs as go
 
-""""
-Citation disclaimer: 
-1. The machine learning parts of our code stem from knowledge that some group members acquired through their participation in the Data Science Fundamentals course. This information comes from lecture materials of the course.
-2. For the figures and the display of the map we used small snippets from code we mostly found on StackOverflow. For troubleshooting we chatted with ChatGPT.
-3. Surprisingly, also asking other parties regarding certain problems helped out sometimes.
-"""
+# Citation disclaimer: 
+# 1. The machine learning parts of our code stem from knowledge that some group members acquired through their participation in the Data Science Fundamentals course. This information comes from lecture materials of the course.
+# 2. For the figures and the display of the map we used small snippets from code we mostly found on StackOverflow. For troubleshooting we chatted with ChatGPT.
+# 3. Surprisingly, also asking other parties regarding certain problems helped out sometimes.
+
 # Standard coordinates for St. Gallen to set default values for the geolocation functions before the use inputs an address
 default_lat, default_lon = 47.424482, 9.376717
 
@@ -304,9 +303,7 @@ def display_property_details(row):
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-"""
-Citation: For the different steps here we used various snippets from different StackOverflow posts.
-"""
+# Citation: For the different steps here we used various snippets from different StackOverflow posts.
 
 # Function to render different steps in the Streamlit app
 def render_step(step, placeholder):
