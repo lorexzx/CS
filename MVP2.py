@@ -203,7 +203,7 @@ def extract_zip_from_address(address):
     if location:
         return location.latitude, location.longitude
     else:
-        st.error("Invalid or missing zip code. Please enter a valid address or zip code in St. Gallen.")
+        st.error("Invalid or missing zip code. Please enter a valid address or zip code in the city of St. Gallen.")
         return None, None  # Handling cases where geocoding fails
 
 # Geolocate a given text input to get latitude and longitude
