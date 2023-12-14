@@ -1,0 +1,36 @@
+name: Run Python Webscraper and Update Database
+
+on:
+  push:
+    branches:
+      - patch-1
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at midnight
+
+    jobs:
+  run-script-and-update-file:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.11.5'
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt 
+
+    - name: Run Python Webscraper
+      run: python webscraper.py 
+
+    - name: Commit and push if changes
+      run: |
+        git config --global user.email "lorenzlobo2@web.de"
+        git config --global user.name "lorexzx"
+        git add immobilienliste.xlsx
+        git commit -m "Update file" || echo "No changes to commit"
+        git push
