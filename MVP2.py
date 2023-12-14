@@ -307,7 +307,7 @@ def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
             # Step 1: Location
-            address_input = st.text_input("Please enter an address AND your zip code in St. Gallen:", 
+            address_input = st.text_input("Please enter an address AND your zip code in the city St. Gallen:", 
                                   value=st.session_state.get('address', ''), 
                                   key="address_input_step1")
             # Process and store the entered address
