@@ -155,7 +155,7 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
     sorted_data['area_code'] = sorted_data['area_code'].astype(int)
     sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
 
-    # Convert inputs to correct types and check for validity
+    # Convert inputs to correct types and validation
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
