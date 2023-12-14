@@ -290,7 +290,7 @@ def display_property_details(row):
         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
         price_per_month = row.get('Price', 'N/A')
         area_code = row.get('zip', 'N/A')
-        websites = row.get('websites', '')  # Neues Feld für Website hinzufügen
+        websites = row.get('Websites', '')  # Neues Feld für Website hinzufügen
 
         # Displaying the extracted property details in English
         st.write(f"**Number of rooms:** {rooms if rooms is not None else 'N/A'}")
