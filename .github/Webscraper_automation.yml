@@ -5,7 +5,7 @@ on:
     branches:
       - patch-1
   schedule:
-    - cron: '01 19 * * *' # Runs every day at ..:.. mm hh
+    - cron: '03 19 * * *' # Runs every day at ..:.. mm hh
 
     jobs:
   run-script-and-update-file:
