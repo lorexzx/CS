@@ -379,44 +379,44 @@ def render_step(step, placeholder):
                             # Step 5: Result
                         # Step 5: Result
                     # Step 5: Result
-                    elif step == 4:  # Results step
-                        if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
-                            if st.button('Predict Rental Price', key='predict_button'):
-                                extracted_zip_code = st.session_state.extracted_zip_code
-                                if extracted_zip_code is not None:
-                                    predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
-                                    if predicted_price is not None:
-                                        st.session_state.predicted_price = predicted_price
-                                        st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
+                elif step == 4:  # Results step
+                    if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
+                        if st.button('Predict Rental Price', key='predict_button'):
+                            extracted_zip_code = st.session_state.extracted_zip_code
+                            if extracted_zip_code is not None:
+                                predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                                if predicted_price is not None:
+                                    st.session_state.predicted_price = predicted_price
+                                    st.write(f"The predicted price for the apartment is CHF {predicted_price:.2f}")
 
-                                        # Ähnliche Immobilien finden und anzeigen
-                                        similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
-                                        if not similar_properties.empty:
-                                            st.markdown("### Ähnliche Immobilien:")
-                                            num_properties_to_display = min(6, len(similar_properties))
-                                            
-                                            for index in range(0, num_properties_to_display, 2):
-                                                col1, col2 = st.columns(2)
+                                    # Ähnliche Immobilien finden und anzeigen
+                                    similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
+                                    if not similar_properties.empty:
+                                        st.markdown("### Ähnliche Immobilien:")
+                                        num_properties_to_display = min(6, len(similar_properties))
+                                        
+                                        for index in range(0, num_properties_to_display, 2):
+                                            col1, col2 = st.columns(2)
 
-                                                # Zeige Immobilie in der ersten Spalte
-                                                if index < len(similar_properties):
-                                                    row = similar_properties.iloc[index]
-                                                    with col1:
-                                                        display_property_details(row)
+                                            # Zeige Immobilie in der ersten Spalte
+                                            if index < len(similar_properties):
+                                                row = similar_properties.iloc[index]
+                                                with col1:
+                                                    display_property_details(row)
 
-                                                # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
-                                                if index + 1 < len(similar_properties):
-                                                    row = similar_properties.iloc[index + 1]
-                                                    with col2:
-                                                        display_property_details(row)
-                                        else:
-                                            st.write("Keine ähnlichen Immobilien gefunden.")
+                                            # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
+                                            if index + 1 < len(similar_properties):
+                                                row = similar_properties.iloc[index + 1]
+                                                with col2:
+                                                    display_property_details(row)
                                     else:
-                                        st.error("Unable to predict price. Please check your inputs.")
+                                        st.write("Keine ähnlichen Immobilien gefunden.")
                                 else:
-                                    st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
-                        else:
-                            st.error("Please enter all required information in the previous steps.")
+                                    st.error("Unable to predict price. Please check your inputs.")
+                            else:
+                                st.error("Invalid or missing zip code. Please enter a valid address or zip code.")
+                    else:
+                        st.error("Please enter all required information in the previous steps.")
 
 # Function to render navigation buttons
 def render_navigation_buttons(placeholder):
