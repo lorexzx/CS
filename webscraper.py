@@ -62,13 +62,13 @@ for page in range(1,2):  # Ändern Sie 5 auf die tatsächliche Anzahl der Seiten
         websites = [element.text.strip() for element in website_elements]
 
         page_data = {
-            'Makler': names_brooker,
-            'Beschreibung': descriptions,
+            'Name': names_brooker,
+            'Description': descriptions,
             'Details': descriptions2,
-            'Ort': locations,
-            'Preis': prices,
-            'Preis pro m²/Jahr': pricem2,
-            'zipp': zips,
+            'Place': locations,
+            'Price': prices,
+            'Price_per_m2_per_year': pricem2,
+            'zip': zips,
             'websiten': websites 
         }
 
