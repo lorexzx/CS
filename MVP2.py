@@ -1,16 +1,15 @@
 """
 This code is part of a Streamlit application designed to estimate fair rental values for properties, 
 particularly useful for students assessing the fairness of their current or prospective rental accommodations. 
-The app is focused on the St. Gallen area and uses a linear regression model to make its predictions.
+The app is focused on the St. Gallen city area and uses a linear regression model to make its predictions.
 
 Simplified overview of how the application works:
 
 Data Handling: The app processes real estate data, focusing on properties in St. Gallen. This includes gathering details like room count, size, and price.
 Model Training: Using this data, a linear regression model is trained to understand the relationship between these property features and their rental prices.
-User Interaction: Students can interact with the app by entering details about a property they are interested in or currently renting. This includes specifics like the number of rooms, size, and location.
+User Interaction: Students can interact with the app by entering details about a property they are interested in or currently renting inside the streamlit application. This includes specifics like the number of rooms, size, and location.
 Fair Price Estimation: The app then uses the trained model to predict a fair rental price for the given property, based on the inputted features.
-Visualization and Comparison: Additionally, the app may offer visualizations like maps and compare the predicted fair price with the actual price to help users determine if they are paying a reasonable amount.
-
+Visualization and Comparison: Additionally, the app offers some visualizations like a map and compare the predicted fair price with the actual price to help users determine if they are paying a reasonable amount of rent.
 
 In summary, this code uses a linear regression model to provide valuable insights into rental prices in St. Gallen.
 
@@ -21,17 +20,14 @@ import streamlit as st
 import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-import joblib
 import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
-
 import matplotlib as mp
 import plotly.graph_objs as go
-from plotly.basedatatypes import BaseFigure
 
-# Standard coordinates for St. Gallen
+# Standard coordinates for St. Gallen, this location is displayed on the map before 
 default_lat, default_lon = 47.424482, 9.376717
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
@@ -256,7 +252,7 @@ if 'current_step' not in st.session_state:
 model, real_estate_data = preprocess_and_train()
 
 # Streamlit UI setup
-st.title("Rental Price Prediction")
+st.title("Rental Price Predicter")
 
 # Steps in the UI for navigating through the application
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
@@ -470,4 +466,3 @@ def render_navigation_buttons(placeholder):
 # Calls the render_step function with the current step and the placeholder
 render_step(st.session_state.current_step, step_content)
 render_navigation_buttons(step_content)
-
