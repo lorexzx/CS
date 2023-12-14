@@ -354,7 +354,8 @@ def render_step(step, placeholder):
                 if st.button('Predict Rental Price', key='predict_button'):
                     extracted_zip_code = st.session_state.extracted_zip_code
                     if extracted_zip_code is not None:
-                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model)
+                        #predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model) krish
+                        predicted_price = predict_price(st.session_state.size_m2, extracted_zip_code, st.session_state.rooms, model, real_estate_data)
                         if predicted_price is not None:
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
                             st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
