@@ -18,10 +18,9 @@ Usage:
 
 Note: Web scraping is subject to the terms of use of the website. Ensure compliance with realadvisor.ch's 
 terms and conditions before running the scraper.
+
+We used a Youtube tutorial to help us build the web scraper: https://www.youtube.com/watch?v=XVv6mJpFOb0
 """
-
-
-
 
 import re
 import pandas as pd
@@ -39,7 +38,7 @@ def clean_pricem2(pricem2):
     return re.split(r' / m²', pricem2)[0].strip()
 
 # Base URL and common parameters for scraping
-base_url = 'https://realadvisor.ch/de/mieten/9000-st-gallen/haus-wohnung'
+base_url = 'https://realadvisor.ch/de/mieten/stadt-st-gallen/haus-wohnung'
 params = '?east=9.651524100294182&north=47.78651906423726&south=47.05433631754212&west=9.091221365919182'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
