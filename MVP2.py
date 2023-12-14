@@ -87,8 +87,8 @@ def go_to_previous_step():
     st.session_state.current_step -= 1
 
 def preprocess_and_train():
-    file_path = 'Immobilienliste_20231212-220234.xlsx'
-    sorted_data = pd.read_excel('Immobilienliste_20231212-220234.xlsx')
+    file_path = 'Immobilienliste.xlsx'
+    sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
