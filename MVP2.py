@@ -303,6 +303,7 @@ def display_property_details(row):
             st.write("**Websites:** N/A")
 
         st.markdown('</div>', unsafe_allow_html=True)
+        
 """
 Citation: For the different steps here we used various snippets from different StackOverflow posts.
 """
