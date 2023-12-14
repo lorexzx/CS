@@ -252,7 +252,7 @@ if 'current_step' not in st.session_state:
 model, real_estate_data = preprocess_and_train()
 
 # Streamlit UI setup
-st.title("Rental Price Predicter")
+st.title("Rental Price Validator")
 
 # Steps in the UI for navigating through the application
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
