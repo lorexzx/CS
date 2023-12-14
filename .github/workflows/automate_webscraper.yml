@@ -5,8 +5,7 @@ on:
   schedule:
     - cron: '00 00 * * *' # Runs every day at 00:00 UTC+1
   workflow_dispatch: # Enables the function to manually trigger the workflow in GitHub
-  # This environment variable allows certain commands that may otherwise be restricted due to security
-
+  
 # Also allows commands that would otherwise be restricted
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
