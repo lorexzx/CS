@@ -331,7 +331,7 @@ def render_step(step, placeholder):
                 popup_message = "Default Location in St. Gallen"
 
             # Display the map with the location marker
-            map = folium.Map(location=[lat, lon], tiles='Stamen Terrain', zoom_start=16)
+            map = folium.Map(location=[lat, lon], zoom_start=16)
             try:
                 folium.TileLayer('Stamen Terrain', attr='Map data © OpenStreetMap contributors, CC-BY-SA, Tiles © Stamen Design').add_to(map)
             except Exception as e:
