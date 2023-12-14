@@ -247,8 +247,8 @@ if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 step_content = st.empty()
 
+# Embedding the CSS style for the property details display
 def display_property_details(row):
-    # CSS-Stil für den Rahmen
     frame_style = """
     <style>
     .frame {
@@ -260,24 +260,26 @@ def display_property_details(row):
     </style>
     """
 
-    # Einbetten des CSS-Stils
+    
     st.markdown(frame_style, unsafe_allow_html=True)
 
-    # Container mit dem angepassten Stil
+   
     with st.container():
         st.markdown('<div class="frame">', unsafe_allow_html=True)
 
+         # Extracting room and size details from the property data
         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
         price_per_month = row.get('Price', 'N/A')
         area_code = row.get('zip', 'N/A')
         website = row.get('websiten', '')  # Neues Feld für Website hinzufügen
 
-        # Änderungen hier: Übersetzung der Labels ins Englische
+        # Displaying the extracted property details in English
         st.write(f"**Number of rooms:** {rooms if rooms is not None else 'N/A'}")
         st.write(f"**Size:** {size_m2 if size_m2 is not None else 'N/A'} m²")
         st.write(f"**Price:** CHF {price_per_month} per month")
         st.write(f"**Location:** {area_code}")
 
+        # Displaying the website if available
         if website:
             st.markdown(f"**Website:** [ {website} ](https://{website})", unsafe_allow_html=True)
         else:
@@ -285,7 +287,7 @@ def display_property_details(row):
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-# Function to render navigation buttons 
+# Function to render different steps in the Streamlit app
 def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
@@ -293,14 +295,15 @@ def render_step(step, placeholder):
             address_input = st.text_input("Please enter an address AND your zip code in St. Gallen:", 
                                   value=st.session_state.get('address', ''), 
                                   key="address_input_step1")
-
+            # Process and store the entered address
             if address_input:
                 processed_input = process_input(address_input)
                 st.session_state.address = processed_input
-                # Set the extracted_zip_code in session state
+                # Extract and store the zip code from the address
                 extracted_zip_code = extract_zip_code(processed_input)
                 st.session_state.extracted_zip_code = extracted_zip_code
 
+                # Geocode the address and display on map
                 try:
                     lat, lon = get_lat_lon_from_address_or_zip(processed_input)
                     popup_message = f"Location: {processed_input}"
@@ -312,18 +315,16 @@ def render_step(step, placeholder):
                 lat, lon = default_lat, default_lon
                 popup_message = "Default Location in St. Gallen"
 
-            # Create and display the map
+            # Display the map with the location marker
             map = folium.Map(location=[lat, lon], zoom_start=16)
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
-
+        # Step 2: Room Selection
         elif step == 1:
-    # step 2 rooms
-    # Calculate the index for the select box
-            rooms_index = st.session_state.get('rooms', 0)
     
-    # Adjust the index calculation for the new range
+            rooms_index = st.session_state.get('rooms', 0)
+             # Adjust the range of selectable room options
             adjusted_rooms_list = [float(f"{i/2:.1f}") for i in range(2, 15)]  # Creates a list [1, 1.5, 2, ..., 7]
             rooms_index = adjusted_rooms_list.index(rooms_index) if rooms_index in adjusted_rooms_list else 0
 
@@ -333,30 +334,19 @@ def render_step(step, placeholder):
                                         key='rooms_step2')
             st.session_state.rooms = rooms_selection
             
-        #elif step == 1:
-            #step 2 rooms
-                # Calculate the index for the select box
-        #    rooms_index = st.session_state.get('rooms', 0)
-        #    rooms_index = rooms_index - 1 if rooms_index > 0 else 0
-        #    rooms_selection = st.selectbox("Select the number of rooms", 
-        #                                range(1, 7), 
-        #                                index=rooms_index, 
-        #                                key='rooms_step2')
-        #    st.session_state.rooms = rooms_selection
-        
-            # Step 3: Size
+        # Step 3: Size Input
         elif step == 2:
                 size_input = st.number_input("Enter the size in square meters", 
                              min_value=0, 
                              value=st.session_state.get('size_m2', 0), 
                              key='size_m2_step3')
                 st.session_state.size_m2 = size_input
-            # Step 4: Current Rent
+        # Step 4: Current Rent Input
         elif step == 3:
                 st.session_state.current_rent = st.number_input("Enter your current rent in CHF:", min_value=0, value=st.session_state.get('current_rent', 0), step=10, key = "current_rent_step4")
 
-            # Step 5: Result
-        elif step == 4:  # Results step
+        # Step 5: Result Display
+        elif step == 4: 
             if 'extracted_zip_code' in st.session_state and 'rooms' in st.session_state and 'size_m2' in st.session_state:
                 if st.button('Predict Rental Price', key='predict_button'):
                     extracted_zip_code = st.session_state.extracted_zip_code
@@ -367,16 +357,16 @@ def render_step(step, placeholder):
                             st.session_state.predicted_price = predicted_price  # Speichern des berechneten Preises im session state
                             st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
 
-                            # Anzeige der Benutzereingaben
+                            # Display user input for confirmation
                             st.markdown(f"### Your Input:")
                             st.write(f"**Address or zipcode:** {st.session_state.address}")
                             st.write(f"**Rooms:** {st.session_state.rooms}")
                             st.write(f"**Size:** {st.session_state.size_m2} m²")
                             st.write(f"**Current rent:** CHF {st.session_state.current_rent}")
 
-                            # Plotly-Diagramm
+                           # Visualization with Plotly gauge chart
                             current_rent_step4 = st.session_state.current_rent
-                            # Anpassung der Gauge-Werte
+                            # Gauge value adjustments
                             min_gauge_value = 0.9 * predicted_price
                             max_gauge_value = 1.5 * predicted_price
                             one_third_point = min_gauge_value + (1/3) * (max_gauge_value - min_gauge_value)
@@ -408,21 +398,21 @@ def render_step(step, placeholder):
                             fig.update_layout(paper_bgcolor = "white", font = {'color': "black", 'family': "Arial"})
                             st.plotly_chart(fig)
 
-                            # Ähnliche Immobilien finden und anzeigen
+                            # Find and display similar properties
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Find similar properties:")
-                                # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
+                                # Iterate over each property and display it in two columns
                                 for index in range(0, len(similar_properties), 2):
                                     col1, col2 = st.columns(2)
 
-                                    # Zeige Immobilie in der ersten Spalte
+                                    # Show property in the first column
                                     if index < len(similar_properties):
                                         row = similar_properties.iloc[index]
                                         with col1:
                                             display_property_details(row)
 
-                                    # Zeige Immobilie in der zweiten Spalte, wenn vorhanden
+                                    # Show property in the second column, if available
                                     if index + 1 < len(similar_properties):
                                         row = similar_properties.iloc[index + 1]
                                         with col2:
@@ -438,17 +428,19 @@ def render_step(step, placeholder):
                 st.error("Please enter all required information in the previous steps.")
 
 
-# Function to render navigation buttons
+# Render navigation buttons
 def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
-  
+    
+    # Previous step button
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
                 st.session_state.current_step -= 1
                 placeholder.empty()  # Clear the previous content
                 render_step(st.session_state.current_step, placeholder)
-    
+
+    # Next step button
     with col2:
         if st.session_state.current_step < len(steps) - 1:
             if st.button('Next'):
@@ -456,7 +448,7 @@ def render_navigation_buttons(placeholder):
                 placeholder.empty()  # Clear the previous content
                 render_step(st.session_state.current_step, placeholder)
 
-# Call the render_step function with the current step and the placeholder
+# Calls the render_step function with the current step and the placeholder
 render_step(st.session_state.current_step, step_content)
 render_navigation_buttons(step_content)
 
