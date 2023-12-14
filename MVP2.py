@@ -24,10 +24,15 @@ import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
-import matplotlib as mp
 import plotly.graph_objs as go
 
-# Standard coordinates for St. Gallen, this location is displayed on the map before 
+""""
+Citation disclaimer: 
+1. The machine learning parts of our code stem from knowledge that some group members acquired through their participation in the Data Science Fundamentals course. This information comes from lecture materials of the course.
+2. For the figures and the display of the map we used small snippets from code we mostly found on StackOverflow. For troubleshooting we chatted with ChatGPT.
+3. Surprisingly, also asking other parties regarding certain problems helped out sometimes.
+"""
+# Standard coordinates for St. Gallen to set default values for the geolocation functions before the use inputs an address
 default_lat, default_lon = 47.424482, 9.376717
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
@@ -120,21 +125,19 @@ def extract_zip_code(input_text):
 # Predicts the price based on the given features using the trained model
 def predict_price(size_m2, extracted_zip_code, rooms, model):
 
-    # Load and preprocess data from Immobilienliste - Excel file
+    # Load and preprocess data from the scraped data Excel file
     sorted_data = pd.read_excel('Immobilienliste.xlsx') 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
-    # Load coordinate data from gallen_coord.CSV file    
+    # Processing the data CSV file    
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
 
-    # Function to extract room and area details from a string
+    # Function to extract room and area details and applying it
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
         return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
-
-    # Apply the extract_details function to the data
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
     # Function to convert price string to float
@@ -181,11 +184,10 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
     })
     # Use the model to predict the price based on input features
     predicted_price = model.predict(input_features)
-    return predicted_price[0] # Return the first (and only) prediction from the model
+    return predicted_price[0]
 
-# List of valid St. Gallen zip codes for validation
+# List of valid St. Gallen zip codes for validation and non-specific inputs
 def extract_zip_from_address(address):
-    # List of non-specific inputs that don't provide exact locations
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
     non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
 
@@ -209,7 +211,7 @@ def extract_zip_from_address(address):
 # Geolocate a given text input to get latitude and longitude
 def get_lat_lon_from_address_or_zip(input_text):
     geolocator = Nominatim(user_agent="http")
-    # Add 'St. Gallen' suffix for zip codes to narrow down the search
+    # Narrowing down the search
     if input_text.isdigit() and len(input_text) == 4:
         input_text += ", St. Gallen, Switzerland"
 
@@ -301,6 +303,9 @@ def display_property_details(row):
             st.write("**Websites:** N/A")
 
         st.markdown('</div>', unsafe_allow_html=True)
+"""
+Citation: For the different steps here we used various snippets from different StackOverflow posts.
+"""
 
 # Function to render different steps in the Streamlit app
 def render_step(step, placeholder):
@@ -426,13 +431,13 @@ def render_step(step, placeholder):
                                 for index in range(0, len(similar_properties), 2):
                                     col1, col2 = st.columns(2)
 
-                                    # Show property in the first column
+                                    # Show similar properties in the first column
                                     if index < len(similar_properties):
                                         row = similar_properties.iloc[index]
                                         with col1:
                                             display_property_details(row)
 
-                                    # Show property in the second column, if available
+                                    # Show property in the second column, if there are some
                                     if index + 1 < len(similar_properties):
                                         row = similar_properties.iloc[index + 1]
                                         with col2:
@@ -452,12 +457,12 @@ def render_step(step, placeholder):
 def render_navigation_buttons(placeholder):
     col1, col2 = st.columns([1, 1])
     
-    # Previous step button
+    # Previous step button and clearing it
     with col1:
         if st.session_state.current_step > 0:
             if st.button('Previous'):
                 st.session_state.current_step -= 1
-                placeholder.empty()  # Clear the previous content
+                placeholder.empty()
                 render_step(st.session_state.current_step, placeholder)
 
     # Next step button
