@@ -91,7 +91,8 @@ def preprocess_and_train():
     sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
-
+    coords_path = 'gallen_coord.csv'
+    coords_data = pd.read_csv(coords_path)
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
@@ -107,8 +108,8 @@ def preprocess_and_train():
     sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
     sorted_data.dropna(inplace=True)
-
-    X = sorted_data[['rooms', 'area', 'area_code']]
+    sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
+    X = sorted_data[['rooms', 'area', 'latitude', 'longitude']]
     y = sorted_data['Price']
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -270,7 +271,7 @@ def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
             # Step 1: Location
-            address_input = st.text_input("Please enter an address or zip code in St. Gallen:", 
+            address_input = st.text_input("Please enter an address AND your zip code in St. Gallen:", 
                                   value=st.session_state.get('address', ''), 
                                   key="address_input_step1")
 
@@ -297,18 +298,33 @@ def render_step(step, placeholder):
             folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='red')).add_to(map)
             folium_static(map)
         
-        
+
         elif step == 1:
-            #step 2 rooms
-                # Calculate the index for the select box
+    # step 2 rooms
+    # Calculate the index for the select box
             rooms_index = st.session_state.get('rooms', 0)
-            rooms_index = rooms_index - 1 if rooms_index > 0 else 0
+    
+    # Adjust the index calculation for the new range
+            adjusted_rooms_list = [float(f"{i/2:.1f}") for i in range(2, 15)]  # Creates a list [1, 1.5, 2, ..., 7]
+            rooms_index = adjusted_rooms_list.index(rooms_index) if rooms_index in adjusted_rooms_list else 0
+
             rooms_selection = st.selectbox("Select the number of rooms", 
-                                        range(1, 7), 
+                                        adjusted_rooms_list, 
                                         index=rooms_index, 
                                         key='rooms_step2')
             st.session_state.rooms = rooms_selection
-
+            
+        #elif step == 1:
+            #step 2 rooms
+                # Calculate the index for the select box
+        #    rooms_index = st.session_state.get('rooms', 0)
+        #    rooms_index = rooms_index - 1 if rooms_index > 0 else 0
+        #    rooms_selection = st.selectbox("Select the number of rooms", 
+        #                                range(1, 7), 
+        #                                index=rooms_index, 
+        #                                key='rooms_step2')
+        #    st.session_state.rooms = rooms_selection
+        
             # Step 3: Size
         elif step == 2:
                 size_input = st.number_input("Enter the size in square meters", 
