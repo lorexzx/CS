@@ -16,14 +16,14 @@ from plotly.basedatatypes import BaseFigure
 default_lat, default_lon = 47.424482, 9.376717
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
-    # Using the 'Details' column to extract rooms and area, then comparing with input
+    # Filters properties similar to the user's input based on room count and size
     similar_properties = data[
         data.apply(lambda row: is_similar_property(row['Details'], input_rooms, input_size, threshold), axis=1)
     ]
     return similar_properties
 
 def is_similar_property(details, input_rooms, input_size, threshold):
-    # Extracting rooms and area from the 'Details' column
+    # Extracts room count and size from property details and compares with user input
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details)
     area_match = re.search(r'(\d+(\.\d+)?) m²', details)
 
@@ -34,6 +34,7 @@ def is_similar_property(details, input_rooms, input_size, threshold):
     return False
 
 def extract_rooms_and_size(details_str):
+    # Extracts room count and size from a string using regular expressions
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details_str)
     size_match = re.search(r'(\d+(\.\d+)?) m²', details_str)
     rooms = float(rooms_match.group(1)) if rooms_match else None
@@ -47,19 +48,24 @@ if 'current_step' not in st.session_state:
 if 'address' not in st.session_state:
     st.session_state.address = ""
 
+# Advances the Streamlit app to the next step
 def go_to_next_step():
     st.session_state.current_step += 1
 
+# Returns the Streamlit app to the previous step
 def go_to_previous_step():
     st.session_state.current_step -= 1
 
+# Preprocesses the data and trains the Linear Regression model
 def preprocess_and_train(): 
-    file_path = 'bitte.xlsx'
-    sorted_data = pd.read_excel('bitte.xlsx')
+    file_path = 'Immobilienliste.xlsx'
+    sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
+
+    # Extracts room count and size details from a string
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
@@ -67,6 +73,7 @@ def preprocess_and_train():
 
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
+    # Converts price string to a float, removing non-numeric characters
     def convert_price(price_str):
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
@@ -87,6 +94,7 @@ def preprocess_and_train():
     
     return model, sorted_data
 
+# Extracts a zip code from the input text
 def extract_zip_code(input_text):
     parts = input_text.replace(',', ' ').split()
     for part in parts:
@@ -94,34 +102,47 @@ def extract_zip_code(input_text):
             return part
     return None
 
+# Predicts the price based on the given features using the trained model
 def predict_price(size_m2, extracted_zip_code, rooms, model):
 
-    sorted_data = pd.read_excel('bitte.xlsx')
-
+    # Load and preprocess data from Excel file
+    sorted_data = pd.read_excel('Immobilienliste.xlsx') 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
+
+    # Load coordinate data from CSV file    
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
+
+    # Function to extract room and area details from a string
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
         return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
 
+    # Apply the extract_details function to the data
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
+
+    # Function to convert price string to float
     def convert_price(price_str):
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
 
+    # Apply convert_price function and extract area codes
     sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
     sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
+    # Clean and merge data
     sorted_data.dropna(inplace=True)
     sorted_data['area_code'] = sorted_data['area_code'].astype(int)
     sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
+
+    # Convert inputs to correct types and check for validity
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
         rooms = int(rooms)
 
+        # Check if area code is in the data and get corresponding latitude and longitude
         if area_code in sorted_data['area_code'].values:
             area_data = sorted_data[sorted_data['area_code'] == area_code]
             longitude = area_data.iloc[0]['longitude']
@@ -134,6 +155,7 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
         st.error(f"Invalid input: {e}")
         return None
 
+    # Prepare the input features for the model
     input_features = pd.DataFrame({
         'rooms': [rooms],
         'area': [size_m2],
