@@ -242,6 +242,7 @@ st.title("Rental Price Prediction")
 # Steps in the UI for navigating through the application
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 
+# Ensure the current step is set in the session state
 if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 step_content = st.empty()
@@ -284,7 +285,7 @@ def display_property_details(row):
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-
+# Function to render navigation buttons 
 def render_step(step, placeholder):
     with placeholder.container():
         if step == 0:
