@@ -243,9 +243,6 @@ def display_property_details(row):
     # Einbetten des CSS-Stils
     st.markdown(frame_style, unsafe_allow_html=True)
 
-    # Einbetten des CSS-Stils
-    st.markdown(frame_style, unsafe_allow_html=True)
-
     # Container mit dem angepassten Stil
     with st.container():
         st.markdown('<div class="frame">', unsafe_allow_html=True)
@@ -253,15 +250,21 @@ def display_property_details(row):
         rooms, size_m2 = extract_rooms_and_size(row.get('Details', ''))
         price_per_month = row.get('Price', 'N/A')
         area_code = row.get('zip', 'N/A')
-        website = row.get('websiten', 'N/A')  # Neues Feld für Website hinzufügen
+        website = row.get('websiten', '')  # Neues Feld für Website hinzufügen
 
         st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
         st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
         st.write(f"**Preis:** CHF {price_per_month} pro Monat")
         st.write(f"**Adresse:** {area_code}")
-        st.write(f"**Website:** {website}")  # Website-Informationen anzeigen
+
+        # Überprüfen, ob ein Website-Name vorhanden ist, und als Hyperlink anzeigen
+        if website:
+            st.markdown(f"**Website:** [ {website} ](https://{website})", unsafe_allow_html=True)
+        else:
+            st.write("**Website:** N/A")
 
         st.markdown('</div>', unsafe_allow_html=True)
+
 
 def render_step(step, placeholder):
     with placeholder.container():
