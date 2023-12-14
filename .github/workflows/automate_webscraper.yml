@@ -1,14 +1,9 @@
-name: Run Python Webscraper and Update Database (Workflow)
+name: Run Python Webscraper and Update Database (Workflow) #Name of the workflow, this is displayed in GitHub Actions
 
+#What triggers the workflow
 on:
-  push:
-    branches:
-      - patch-1
   schedule:
-    - cron: '0 0 * * *' # Runs every day at 19:30 UTC
-
-env:
-  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+    - cron: '55 21 * * *' # Runs every day at 00:00 UTC+1
 
 jobs:
   run-script-and-update-file:
