@@ -363,11 +363,11 @@ def render_step(step, placeholder):
                             st.markdown(f"**The predicted price for the apartment is CHF {predicted_price:.2f}**", unsafe_allow_html=True)
 
                             # Anzeige der Benutzereingaben
-                            st.markdown(f"### Ihre Eingaben:")
-                            st.write(f"**Adresse oder Postleitzahl:** {st.session_state.address}")
-                            st.write(f"**Zimmer:** {st.session_state.rooms}")
-                            st.write(f"**Größe:** {st.session_state.size_m2} m²")
-                            st.write(f"**Aktuelle Miete:** CHF {st.session_state.current_rent}")
+                            st.markdown(f"### Your Input:")
+                            st.write(f"**Address or zipcode:** {st.session_state.address}")
+                            st.write(f"**Rooms:** {st.session_state.rooms}")
+                            st.write(f"**Size:** {st.session_state.size_m2} m²")
+                            st.write(f"**Current rent:** CHF {st.session_state.current_rent}")
 
                             # Plotly-Diagramm
                             current_rent_step4 = st.session_state.current_rent
