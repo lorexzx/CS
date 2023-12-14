@@ -16,14 +16,14 @@ from plotly.basedatatypes import BaseFigure
 default_lat, default_lon = 47.424482, 9.376717
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
-    # Using the 'Details' column to extract rooms and area, then comparing with input
+    # Filters properties similar to the user's input based on room count and size
     similar_properties = data[
         data.apply(lambda row: is_similar_property(row['Details'], input_rooms, input_size, threshold), axis=1)
     ]
     return similar_properties
 
 def is_similar_property(details, input_rooms, input_size, threshold):
-    # Extracting rooms and area from the 'Details' column
+    # Extracts room count and size from property details and compares with user input
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details)
     area_match = re.search(r'(\d+(\.\d+)?) m²', details)
 
@@ -34,6 +34,7 @@ def is_similar_property(details, input_rooms, input_size, threshold):
     return False
 
 def extract_rooms_and_size(details_str):
+    # Extracts room count and size from a string using regular expressions
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details_str)
     size_match = re.search(r'(\d+(\.\d+)?) m²', details_str)
     rooms = float(rooms_match.group(1)) if rooms_match else None
@@ -47,12 +48,15 @@ if 'current_step' not in st.session_state:
 if 'address' not in st.session_state:
     st.session_state.address = ""
 
+# Advances the Streamlit app to the next step
 def go_to_next_step():
     st.session_state.current_step += 1
 
+# Returns the Streamlit app to the previous step
 def go_to_previous_step():
     st.session_state.current_step -= 1
 
+# Preprocesses the data and trains the Linear Regression model
 def preprocess_and_train(): 
     file_path = 'Immobilienliste.xlsx'
     sorted_data = pd.read_excel('Immobilienliste.xlsx')
@@ -60,6 +64,8 @@ def preprocess_and_train():
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
+
+    # Extracts room count and size details from a string
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
@@ -67,6 +73,7 @@ def preprocess_and_train():
 
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
+    # Converts price string to a float, removing non-numeric characters
     def convert_price(price_str):
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
@@ -87,6 +94,7 @@ def preprocess_and_train():
     
     return model, sorted_data
 
+# Extracts a zip code from the input text
 def extract_zip_code(input_text):
     parts = input_text.replace(',', ' ').split()
     for part in parts:
@@ -94,34 +102,47 @@ def extract_zip_code(input_text):
             return part
     return None
 
+# Predicts the price based on the given features using the trained model
 def predict_price(size_m2, extracted_zip_code, rooms, model):
 
-    sorted_data = pd.read_excel('Immobilienliste.xlsx')
-
+    # Load and preprocess data from Excel file
+    sorted_data = pd.read_excel('Immobilienliste.xlsx') 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
+
+    # Load coordinate data from CSV file    
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
+
+    # Function to extract room and area details from a string
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
         return float(rooms.group(1)) if rooms else None, float(area.group(1)) if area else None
 
+    # Apply the extract_details function to the data
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
+
+    # Function to convert price string to float
     def convert_price(price_str):
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
 
+    # Apply convert_price function and extract area codes
     sorted_data['Price'] = sorted_data['Price'].apply(convert_price)
     sorted_data['area_code'] = sorted_data['zip'].str.extract(r'(\d{4})')
 
+    # Clean and merge data
     sorted_data.dropna(inplace=True)
     sorted_data['area_code'] = sorted_data['area_code'].astype(int)
     sorted_data = sorted_data.merge(coords_data[['area_code', 'latitude', 'longitude']], on ='area_code', how='left')
+
+    # Convert inputs to correct types and check for validity
     try:
         area_code = int(extracted_zip_code)
         size_m2 = float(size_m2)
         rooms = int(rooms)
 
+        # Check if area code is in the data and get corresponding latitude and longitude
         if area_code in sorted_data['area_code'].values:
             area_data = sorted_data[sorted_data['area_code'] == area_code]
             longitude = area_data.iloc[0]['longitude']
@@ -134,6 +155,7 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
         st.error(f"Invalid input: {e}")
         return None
 
+    # Prepare the input features for the model
     input_features = pd.DataFrame({
         'rooms': [rooms],
         'area': [size_m2],
@@ -142,41 +164,34 @@ def predict_price(size_m2, extracted_zip_code, rooms, model):
         'longitude': [longitude],
         
     })
-
+    # Use the model to predict the price based on input features
     predicted_price = model.predict(input_features)
-    return predicted_price[0]
+    return predicted_price[0] # Return the first (and only) prediction from the model
 
-## Function to predict the price based on the model
-#def predict_price(size_m2, area_code, rooms, model): OLD VERSION JUST KEPT IT FOR SECURITA REASONS
-#    input_features = pd.DataFrame({
-#        'Rooms': [rooms],
-#        'Size_m2': [size_m2],
-#        'area_code': [zip_code]
-#    })
-#    predicted_price = model.predict(input_features)
-#    return predicted_price[0]
-
+# List of valid St. Gallen zip codes for validation
 def extract_zip_from_address(address):
+    # List of non-specific inputs that don't provide exact locations
     valid_st_gallen_zip_codes = ['9000', '9001', '9004', '9006', '9007', '9008', '9010', '9011', '9012', '9013', '9014', '9015', '9016', '9020', '9021', '9023', '9024', '9026', '9027', '9028', '9029']
     non_specific_inputs = ['st. gallen', 'st gallen', 'sankt gallen']
 
-    # Check for non-specific input
+    # Handling non-specific inputs by returning default coordinates
     if address.lower().strip() in non_specific_inputs:
-        return default_lat, default_lon  # You can choose to handle non-specific inputs differently
+        return default_lat, default_lon  
 
-    # If the input is a specific zip code, use it as is
+    # Use the input as is if it's a valid specific zip code
     if address.strip() in valid_st_gallen_zip_codes:
         return get_lat_lon_from_address_or_zip(address.strip())
 
-    # Otherwise, try to geocode the address
+    # For other inputs, try to geocode the address to get coordinates
     geolocator = Nominatim(user_agent="http")
     location = geolocator.geocode(address + ", St. Gallen", country_codes='CH')
     if location:
         return location.latitude, location.longitude
     else:
         st.error("Invalid or missing zip code. Please enter a valid address or zip code in St. Gallen.")
-        return None, None  # Handle the case where the geocoding fails
+        return None, None  # Handling cases where geocoding fails
 
+# Geolocate a given text input to get latitude and longitude
 def get_lat_lon_from_address_or_zip(input_text):
     geolocator = Nominatim(user_agent="http")
     # Add 'St. Gallen' suffix for zip codes to narrow down the search
@@ -189,17 +204,17 @@ def get_lat_lon_from_address_or_zip(input_text):
     else:
         return default_lat, default_lon  # Return default coordinates if no location is found
 
-
+ # Update the current step in the Streamlit session state and rerun the app
 def update_step(new_step):
     st.session_state.current_step = new_step
     st.experimental_rerun()
 
 # Function to process and localize the address input to St. Gallen
 def process_address_input(input_address):
-    # Define different variations of St. Gallen to check
+    # Variants of St. Gallen to check in the address
     st_gallen_variants = ['st. gallen', 'st gallen', 'sankt gallen', 'saint gallen']
     
-    # Check if any variant of St. Gallen is already in the address
+    # Checks if the input address already contains a variant of St. Gallen
     if any(variant in input_address.lower() for variant in st_gallen_variants):
         # Address already contains a variant of St. Gallen
         return input_address
@@ -207,23 +222,24 @@ def process_address_input(input_address):
         # Append "St. Gallen" to localize the search
         return input_address + ", St. Gallen"
 
-
+# Process the input text based on whether it's a zip code or a general address
 def process_input(input_text):
-    # Check if input is a 4-digit number (zip code)
     if input_text.isdigit() and len(input_text) == 4:
-        return input_text + ", St. Gallen, Switzerland"
+        return input_text + ", St. Gallen, Switzerland"# Process as zip code
     else:
-        return process_address_input(input_text)  # Process general address
+        return process_address_input(input_text)  # Process as ageneral address
 
 # Initialize session state for current step
 if 'current_step' not in st.session_state:
     st.session_state.current_step = 0
 
-# Preprocess data and train the model
+# Load data and train the model
 model, real_estate_data = preprocess_and_train()
 
+# Streamlit UI setup
 st.title("Rental Price Prediction")
 
+# Steps in the UI for navigating through the application
 steps = ["Location", "Rooms", "Size", "My Current Rent", "Results"]
 
 if 'current_step' not in st.session_state:
@@ -442,3 +458,4 @@ def render_navigation_buttons(placeholder):
 # Call the render_step function with the current step and the placeholder
 render_step(st.session_state.current_step, step_content)
 render_navigation_buttons(step_content)
+
