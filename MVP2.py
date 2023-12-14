@@ -376,11 +376,20 @@ def render_step(step, placeholder):
                             st.plotly_chart(fig)
 
                             # Ähnliche Immobilien finden und anzeigen
+                            # Step 5: Result
+                        elif step == 4:  # Results step
+                            # ... [Der restliche Code bleibt unverändert]
+
+                            # Ähnliche Immobilien finden und anzeigen
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
                                 st.markdown("### Ähnliche Immobilien:")
+                                
+                                # Beschränken Sie die Anzahl der angezeigten ähnlichen Immobilien auf maximal 6
+                                num_properties_to_display = min(6, len(similar_properties))
+                                
                                 # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
-                                for index in range(0, len(similar_properties), 2):
+                                for index in range(0, num_properties_to_display, 2):
                                     col1, col2 = st.columns(2)
 
                                     # Zeige Immobilie in der ersten Spalte
