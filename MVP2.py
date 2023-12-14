@@ -332,7 +332,7 @@ def render_step(step, placeholder):
 
             # Display the map with the location marker
             map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='green')).add_to(map)
+            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='green', prefix='fa',icon='home')).add_to(map)
             folium_static(map)
         
         # Step 2: Room Selection
