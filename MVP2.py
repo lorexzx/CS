@@ -37,8 +37,8 @@ def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5)
     ]
     return similar_properties
 
+#Extracts room count and size from property details and compares with user input
 def is_similar_property(details, input_rooms, input_size, threshold):
-    # Extracts room count and size from property details and compares with user input
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details)
     area_match = re.search(r'(\d+(\.\d+)?) m²', details)
 
@@ -48,8 +48,8 @@ def is_similar_property(details, input_rooms, input_size, threshold):
         return (rooms >= input_rooms - 1 and rooms <= input_rooms + 1) and (area >= input_size - threshold and area <= input_size + threshold)
     return False
 
+# Extracts room count and size from a string using regular expressions
 def extract_rooms_and_size(details_str):
-    # Extracts room count and size from a string using regular expressions
     rooms_match = re.search(r'(\d+(\.\d+)?) Zi\.', details_str)
     size_match = re.search(r'(\d+(\.\d+)?) m²', details_str)
     rooms = float(rooms_match.group(1)) if rooms_match else None
@@ -80,7 +80,7 @@ def preprocess_and_train():
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
 
-    # Extracts room count and size details from a string
+    # Extracts room count and size details
     def extract_details(detail_str):
         rooms = re.search(r'(\d+(\.\d+)?) Zi\.', detail_str)
         area = re.search(r'(\d+(\.\d+)?) m²', detail_str)
@@ -120,11 +120,11 @@ def extract_zip_code(input_text):
 # Predicts the price based on the given features using the trained model
 def predict_price(size_m2, extracted_zip_code, rooms, model):
 
-    # Load and preprocess data from Excel file
+    # Load and preprocess data from Immobilienliste - Excel file
     sorted_data = pd.read_excel('Immobilienliste.xlsx') 
     sorted_data.drop(columns=['Name', 'Description'], inplace=True)
 
-    # Load coordinate data from CSV file    
+    # Load coordinate data from gallen_coord.CSV file    
     coords_path = 'gallen_coord.csv'
     coords_data = pd.read_csv(coords_path)
 
