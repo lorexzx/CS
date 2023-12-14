@@ -267,12 +267,12 @@ def display_property_details(row):
         area_code = row.get('zip', 'N/A')
         website = row.get('websiten', '')  # Neues Feld für Website hinzufügen
 
-        st.write(f"**Zimmer:** {rooms if rooms is not None else 'N/A'}")
-        st.write(f"**Größe:** {size_m2 if size_m2 is not None else 'N/A'} m²")
-        st.write(f"**Preis:** CHF {price_per_month} pro Monat")
-        st.write(f"**Adresse:** {area_code}")
+        # Änderungen hier: Übersetzung der Labels ins Englische
+        st.write(f"**Room:** {rooms if rooms is not None else 'N/A'}")
+        st.write(f"**Size:** {size_m2 if size_m2 is not None else 'N/A'} m²")
+        st.write(f"**Price:** CHF {price_per_month} per month")
+        st.write(f"**Address:** {area_code}")
 
-        # Überprüfen, ob ein Website-Name vorhanden ist, und als Hyperlink anzeigen
         if website:
             st.markdown(f"**Website:** [ {website} ](https://{website})", unsafe_allow_html=True)
         else:
@@ -406,7 +406,7 @@ def render_step(step, placeholder):
                             # Ähnliche Immobilien finden und anzeigen
                             similar_properties = find_similar_properties_adjusted(st.session_state.rooms, st.session_state.size_m2, real_estate_data)
                             if not similar_properties.empty:
-                                st.markdown("### Ähnliche Immobilien:")
+                                st.markdown("### Find similar properties:")
                                 # Iteriere über jede Immobilie und zeige sie in zwei Spalten an
                                 for index in range(0, len(similar_properties), 2):
                                     col1, col2 = st.columns(2)
