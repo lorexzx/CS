@@ -13,7 +13,7 @@ import plotly.graph_objs as go
 from plotly.basedatatypes import BaseFigure
 
 # Standard coordinates for St. Gallen
-default_lat, default_lon = 47.424482, 9.376717
+default_lat, default_lon = 47.424482, 9.376717 
 
 def find_similar_properties_adjusted(input_rooms, input_size, data, threshold=5):
     # Using the 'Details' column to extract rooms and area, then comparing with input
