@@ -332,8 +332,11 @@ def render_step(step, placeholder):
 
             # Display the map with the location marker
             map = folium.Map(location=[lat, lon], zoom_start=16)
-            folium.TileLayer('Stamen Terrain', attr='Map data © OpenStreetMap contributors, CC-BY-SA, Tiles © Stamen Design').add_to(map)
-            folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='green', prefix='fa', icon='home')).add_to(map)
+            try:
+                folium.TileLayer('Stamen Terrain', attr='Map data © OpenStreetMap contributors, CC-BY-SA, Tiles © Stamen Design').add_to(map)
+            except Exception as e:
+                st.error(f"Failed to load Stamen Terrain tiles: {e}")            
+                folium.Marker([lat, lon], popup=popup_message, icon=folium.Icon(color='green', prefix='fa', icon='home')).add_to(map)
             folium.LayerControl().add_to(map)
             folium_static(map)
         
