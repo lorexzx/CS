@@ -78,9 +78,9 @@ for page in range(1,2):  # Ändern Sie 5 auf die tatsächliche Anzahl der Seiten
         print(f"Fehler beim Laden der Seite {page}")
 
 # Zusammenführen aller Daten in einem DataFrame
+# Zusammenführen aller Daten in einem DataFrame
 df = pd.concat(all_data, ignore_index=True)
 
-# Speichern des DataFrames in einer Excel-Datei
-timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-file_path = f'/Users/maxgrau/Desktop/CS/Immobilienliste_{timestamp}.xlsx'
+# Speichern des DataFrames in einer festen Excel-Datei
+file_path = '/Users/maxgrau/Desktop/CS/Immobilienliste.xlsx'
 df.to_excel(file_path, index=False)
