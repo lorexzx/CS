@@ -7,43 +7,10 @@ import folium
 from streamlit_folium import folium_static 
 from geopy.geocoders import Nominatim
 import re
-# Copyright (c) Streamlit Inc. (2018-2022) Snowflake Inc. (2022)
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-import json
-import urllib.parse
-from typing import TYPE_CHECKING, Any, Dict, List, Set, Union, cast
-
-from typing_extensions import Final, Literal, TypeAlias
-
-from streamlit import type_util
-from streamlit.errors import StreamlitAPIException
-from streamlit.logger import get_logger
-from streamlit.proto.PlotlyChart_pb2 import PlotlyChart as PlotlyChartProto
-from streamlit.runtime.legacy_caching import caching
-from streamlit.runtime.metrics_util import gather_metrics
 
 import matplotlib as mp
 import plotly.graph_objs as go
 from plotly.basedatatypes import BaseFigure
-
-from streamlit.delta_generator import DeltaGenerator
-
-
-
-# Setzen Sie das Plotly-Standard-Design
-
 
 # Standard coordinates for St. Gallen
 default_lat, default_lon = 47.424482, 9.376717
@@ -268,10 +235,10 @@ def display_property_details(row):
         website = row.get('websiten', '')  # Neues Feld für Website hinzufügen
 
         # Änderungen hier: Übersetzung der Labels ins Englische
-        st.write(f"**Room:** {rooms if rooms is not None else 'N/A'}")
+        st.write(f"**Number of rooms:** {rooms if rooms is not None else 'N/A'}")
         st.write(f"**Size:** {size_m2 if size_m2 is not None else 'N/A'} m²")
         st.write(f"**Price:** CHF {price_per_month} per month")
-        st.write(f"**Address:** {area_code}")
+        st.write(f"**Location:** {area_code}")
 
         if website:
             st.markdown(f"**Website:** [ {website} ](https://{website})", unsafe_allow_html=True)
