@@ -67,13 +67,15 @@ if 'current_step' not in st.session_state:
 if 'address' not in st.session_state:
     st.session_state.address = ""
 
-# Advances the Streamlit app to the next step
+# Takes Streamlit app to the next step
 def go_to_next_step():
     st.session_state.current_step += 1
 
-# Returns the Streamlit app to the previous step
+# Takes Streamlit app to the previous step
 def go_to_previous_step():
     st.session_state.current_step -= 1
+
+#Here we used knowledge aquired in the DSF course.
 
 # Preprocesses the data and trains the Linear Regression model
 def preprocess_and_train(): 
@@ -92,7 +94,7 @@ def preprocess_and_train():
 
     sorted_data['rooms'], sorted_data['area'] = zip(*sorted_data['Details'].apply(extract_details))
 
-    # Converts price string to a float, removing non-numeric characters
+    # Converts the price from a string to a float
     def convert_price(price_str):
         price_str = re.sub(r'[^\d.]', '', price_str)
         return float(price_str) if price_str else None
@@ -113,7 +115,7 @@ def preprocess_and_train():
     
     return model, sorted_data
 
-# Extracts a zip code from the input text
+# Extracts the zip code from the input text
 def extract_zip_code(input_text):
     parts = input_text.replace(',', ' ').split()
     for part in parts:
