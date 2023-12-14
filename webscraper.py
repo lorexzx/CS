@@ -16,9 +16,6 @@ Usage:
 - The required libraries (pandas, BeautifulSoup, requests) should be installed before running the script.
 - The final dataset is saved as an Excel file on the specified path.
 
-Note: Web scraping is subject to the terms of use of the website. Ensure compliance with realadvisor.ch's 
-terms and conditions before running the scraper.
-
 We used a Youtube tutorial to help us build the web scraper: https://www.youtube.com/watch?v=XVv6mJpFOb0
 """
 
@@ -29,32 +26,32 @@ import requests
 from datetime import datetime
 
 def clean_price(price): 
-    # Replace non-breaking spaces and remove hyphens from price
+    # Replace non-breaking spaces and remove hyphens from the price
     return price.replace('\xa0', ' ').replace('-', '').strip()
 
 def clean_pricem2(pricem2):
-    # Remove non-breaking spaces and anything after "/ m²" in price per square meter
+    # Remove non-breaking spaces and anything after / m² in the price per square meter
     pricem2 = pricem2.replace('\xa0', ' ')
     return re.split(r' / m²', pricem2)[0].strip()
 
-# Base URL and common parameters for scraping
+# URL the scraper accessess when its running and 
 base_url = 'https://realadvisor.ch/de/mieten/stadt-st-gallen/haus-wohnung'
 params = '?east=9.651524100294182&north=47.78651906423726&south=47.05433631754212&west=9.091221365919182'
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
 all_data = []
 
-# Loop over page numbers
-for page in range(1, 19):  # Scraping 18 pages
+# Loop for the URL for the individual 18 pages
+for page in range(1, 19): 
     if page == 1:
-        url = base_url + params  # URL for the first page
+        url = base_url + params  
     else:
-        url = f'{base_url}/seite-{page}{params}'  # URL for subsequent pages
+        url = f'{base_url}/seite-{page}{params}'  
 
-    # Send request to the page
+    # Requests the page
     response = requests.get(url, headers=headers)
     
-    # If it's the second page, resend the request
+    # We resend the second page, this allows us to bypass the cookies window and keep scraping
     if page == 2:
         response = requests.get(url, headers=headers)
 
@@ -62,7 +59,7 @@ for page in range(1, 19):  # Scraping 18 pages
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, 'lxml')
         
-        # Extracting various data from the page
+        # The individual data that gets scraped and their element
         names_brooker_elements = soup.find_all('div', class_='css-1mtsvd6-AggregatesListingCard')
         names_brooker = [element.text.strip() for element in names_brooker_elements]
 
@@ -87,7 +84,7 @@ for page in range(1, 19):  # Scraping 18 pages
         website_elements = soup.find_all('div', class_='css-vc4s6w-AggregatesListingCard')
         websites = [element.text.strip() for element in website_elements]
 
-        # Compiling page data into a dictionary
+        # Dictionary for the page data
         page_data = {
             'Name': names_brooker,
             'Description': descriptions,
@@ -99,15 +96,15 @@ for page in range(1, 19):  # Scraping 18 pages
             'Websites': websites 
         }
 
-        # Appending the data of each page to all_data list
+        # Assigning the data to page_data
         all_data.append(pd.DataFrame(page_data))
 
     else:
         print(f"Error loading page {page}")
 
-# Merging all data into a single DataFrame
+# Merging the data into one DataFrame
 df = pd.concat(all_data, ignore_index=True)
 
-#Save file in relative path
-file_path = 'Immobilienliste.xlsx'  # Relative path
+#Saving the data file
+file_path = 'Immobilienliste.xlsx'  
 df.to_excel(file_path, index=False)
