@@ -3,7 +3,7 @@ name: Run Python Webscraper and Update Database (Workflow) #Name of the workflow
 # THis is the trigger that executes the workflow
 on:
   schedule:
-    - cron: '20 20 * * *' # Runs every day at 00:00 UTC+1
+    - cron: '25 20 * * *' # Runs every day at 00:00 UTC+1
 
   # This environment variable allows certain commands that may otherwise be restricted due to security
 env:
