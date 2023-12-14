@@ -86,7 +86,7 @@ def go_to_next_step():
 def go_to_previous_step():
     st.session_state.current_step -= 1
 
-def preprocess_and_train():
+def preprocess_and_train(): 
     file_path = 'Immobilienliste.xlsx'
     sorted_data = pd.read_excel('Immobilienliste.xlsx')
 
